@@ -151,7 +151,9 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-**Current status: Phase 1 (Foundation) complete. Next: Phase 2 (BIS knowledge base).**
+**Current status: Phase 2A complete — knowledge-base schema, validation, and loader
+exist (JSON files, no database yet), holding only labelled `sample` placeholders.
+Next: Phase 2B (add real verified BIS content).**
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -163,10 +165,26 @@ sih26107/
   README.md            # setup & run instructions
   backend/             # Python + FastAPI service
     app/
-      __init__.py
       main.py          # FastAPI app + /health endpoint
+      knowledge/       # knowledge-base schema + loader
+        schema.py      # KnowledgeItem pydantic model + validation rules
+        loader.py      # load + validate data/knowledge/, report every problem
+    scripts/
+      check_knowledge.py   # CLI: validate the knowledge base
+    tests/
+      test_knowledge.py    # plain-Python checks (no test framework)
     requirements.txt
     .env.example
-  data/                # curated BIS knowledge base source files (Phase 2)
+  data/
+    knowledge/         # the BIS knowledge base: one JSON file per category
   frontend/            # React + Vite app — added when the UI phase begins
 ```
+
+### Knowledge base
+
+`data/knowledge/` holds one JSON array file per category. `KnowledgeItem`
+(`backend/app/knowledge/schema.py`) is a flat structure that maps 1:1 to a future
+PostgreSQL row. Rules: unique slug IDs, non-sample items need a `source_url`,
+`indian_standards` items need a `standard_number`, `verified` items need
+`source_url` + `last_verified`. Validate with
+`./.venv/bin/python scripts/check_knowledge.py`.

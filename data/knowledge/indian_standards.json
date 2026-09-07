@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sample-placeholder-standard",
+    "title": "SAMPLE PLACEHOLDER — not a real Indian Standard",
+    "category": "indian_standards",
+    "content": "This is a development placeholder used only to verify the knowledge-base loader and schema. It does not contain real BIS content. Replace it with verified Indian Standard information in Phase 2B.",
+    "keywords": ["sample", "placeholder", "development"],
+    "standard_number": "IS-SAMPLE-0000 (placeholder, not a real Indian Standard)",
+    "source_organization": "N/A — development placeholder",
+    "verification_status": "sample"
+  }
+]

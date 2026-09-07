@@ -1,0 +1,11 @@
+[
+  {
+    "id": "sample-placeholder-faq",
+    "title": "SAMPLE PLACEHOLDER — not real BIS FAQ content",
+    "category": "faqs",
+    "content": "This is a development placeholder used only to verify the knowledge-base loader and schema. It does not contain real BIS content. Replace it with verified BIS FAQ entries in Phase 2B.",
+    "keywords": ["sample", "placeholder", "development"],
+    "source_organization": "N/A — development placeholder",
+    "verification_status": "sample"
+  }
+]

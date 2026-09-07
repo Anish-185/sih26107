@@ -11,16 +11,34 @@ See [`CLAUDE.md`](./CLAUDE.md) for the full project rules and roadmap.
 
 ## Status
 
-**Phase 1 (Foundation) — complete.** Backend runs and answers a health check.
-No retrieval, knowledge base, or LLM yet. Next: Phase 2 (BIS knowledge base).
+**Phase 2A — complete.** The knowledge-base structure, schema, validation, and a
+loader exist (JSON files, no database yet). It currently holds only two clearly
+labelled `sample` placeholders. No retrieval, RAG, or LLM yet.
+Next: Phase 2B (add real, verified BIS content).
 
 ## Project layout
 
 ```
 backend/    Python + FastAPI service
-data/       curated BIS knowledge base source files (Phase 2)
+  app/knowledge/   knowledge-base schema + loader
+  scripts/         check_knowledge.py — validate the knowledge base
+  tests/           plain-Python checks
+data/
+  knowledge/       the BIS knowledge base — one JSON file per category
 frontend/   React + Vite app (added when the UI phase begins)
 ```
+
+## Knowledge base
+
+The knowledge base in `data/knowledge/` is the source of truth for BIS
+information. Validate it any time:
+
+```bash
+cd backend
+./.venv/bin/python scripts/check_knowledge.py
+```
+
+See [`data/knowledge/README.md`](./data/knowledge/README.md) for the schema and rules.
 
 ## Running the backend
 

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "dup-id",
+    "title": "First item with this id",
+    "category": "faqs",
+    "content": "This item is fine on its own but its id is reused further down the file.",
+    "verification_status": "sample",
+    "source_organization": "N/A — fixture"
+  },
+  {
+    "id": "dup-id",
+    "title": "Second item reusing the same id",
+    "category": "faqs",
+    "content": "The loader should reject this because 'dup-id' was already defined above.",
+    "verification_status": "sample",
+    "source_organization": "N/A — fixture"
+  },
+  {
+    "id": "wrong-file",
+    "title": "Item whose category does not match its file",
+    "category": "certification",
+    "content": "This lives in faqs.json but claims to be a certification item, so the loader should reject it.",
+    "verification_status": "sample",
+    "source_organization": "N/A — fixture"
+  }
+]
