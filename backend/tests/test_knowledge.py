@@ -122,6 +122,11 @@ def test_loader_reports_broken_kb() -> None:
     check("invalid JSON reported", "invalid JSON" in messages, messages)
     check("duplicate id reported", "duplicate id" in messages, messages)
     check(
+        "duplicate standard_number reported",
+        "duplicate standard_number" in messages,
+        messages,
+    )
+    check(
         "category/file mismatch reported",
         "does not match file" in messages,
         messages,

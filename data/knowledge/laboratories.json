@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "id": "bis-own-laboratories",
+    "title": "BIS laboratories",
+    "category": "laboratories",
+    "content": "BIS states that it has established a network of eight BIS laboratories that carry out testing in support of its conformity assessment schemes. BIS publishes lab-wise test facilities and directs users to the LIMS portal (lims.bis.gov.in) for the current list of laboratories, their scope of testing and testing charges. Individual BIS laboratory names, locations and test scopes are published by BIS but were not captured in this record.",
+    "keywords": ["bis laboratory", "testing", "lims", "conformity assessment", "eight laboratories"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/laboratorys/laboratory-services-overview/?lang=en",
+    "document_name": "BIS: Laboratory Services Overview",
+    "reference": "lims.bis.gov.in",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "bis-laboratory-recognition-scheme",
+    "title": "BIS Laboratory Recognition Scheme",
+    "category": "laboratories",
+    "content": "BIS operates a Laboratory Recognition Scheme under which laboratories outside BIS are recognised to test samples for BIS certification work. BIS states that recognition documentation includes the Lab Recognition Scheme 2020 and its amendments, and that recognised laboratories can hold accreditation such as from NABL (National Accreditation Board for Testing and Calibration Laboratories).",
+    "keywords": ["laboratory recognition", "recognised laboratory", "lab recognition scheme 2020", "nabl", "accreditation"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/laboratorys/laboratory-services-overview/?lang=en",
+    "document_name": "BIS: Laboratory Services Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "bis-recognised-laboratory-lists",
+    "title": "Where to find the list of BIS-recognised laboratories",
+    "category": "laboratories",
+    "content": "BIS publishes lists of recognised and empanelled laboratories on its website, including a list of Group-1 BIS recognised laboratories, a list of government laboratories listed by BIS, and an IS-wise list of recognised laboratories. These are provided as downloadable documents and an online database rather than as a single web page; laboratory names and cities are contained in those documents.",
+    "keywords": ["recognised laboratory list", "empanelled laboratory", "group-1", "government laboratory", "is-wise"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/laboratorys/list-of-bis-recognized-lab/",
+    "document_name": "BIS: List of BIS Recognised / Empanelled Labs",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "assaying-and-hallmarking-centres",
+    "title": "Assaying and Hallmarking Centres (AHCs)",
+    "category": "laboratories",
+    "content": "Hallmarking of gold and silver articles is carried out at BIS-recognised Assaying and Hallmarking Centres (AHCs), which test the precious-metal content of an article and apply the hallmark. BIS publishes information on recognised AHCs in its hallmarking section. Specific centre names and locations were not captured in this record.",
+    "keywords": ["assaying and hallmarking centre", "ahc", "hallmarking", "gold", "silver", "testing"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking/",
+    "document_name": "BIS: Hallmarking",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  }
+]

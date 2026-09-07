@@ -1,1 +1,75 @@
-[]
+[
+  {
+    "id": "bis-care-app-for-consumers",
+    "title": "The BIS Care App",
+    "category": "consumer_information",
+    "content": "BIS provides the BIS Care App as a tool for consumer empowerment. According to the BIS Hallmarking FAQ, a consumer can use it to verify the six-digit HUID number on a hallmarked gold or silver article. The app is listed by BIS in its consumer engagement and BIS Apps sections.",
+    "keywords": ["bis care app", "consumer", "huid verification", "hallmark", "mobile app"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "online-complaint-registration",
+    "title": "Filing a complaint with BIS",
+    "category": "consumer_information",
+    "content": "BIS provides an online complaint registration facility for consumers on its website (Consumer section) and a facility to check the status of a submitted complaint. This is the route to report a substandard product carrying the ISI Mark or a hallmark, or misuse of the marks.",
+    "keywords": ["complaint", "grievance", "isi mark misuse", "hallmark", "consumer", "online complaint"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/consumer-engagement/",
+    "document_name": "BIS: Consumer Engagement",
+    "reference": "Online Complaint Registration",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "standards-clubs",
+    "title": "BIS Standards Clubs",
+    "category": "consumer_information",
+    "content": "BIS runs a Standards Clubs initiative described as an effort to build quality consciousness among students, working through groups of young 'brand ambassadors' in schools and colleges. Guidelines and proposal submission are available in the BIS consumer engagement section.",
+    "keywords": ["standards club", "students", "quality awareness", "consumer engagement", "education"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/consumer-engagement/",
+    "document_name": "BIS: Consumer Engagement",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "what-the-isi-mark-tells-a-consumer",
+    "title": "What the ISI Mark tells a buyer",
+    "category": "consumer_information",
+    "content": "The ISI Mark (Standard Mark) on a product indicates that the manufacturer holds a BIS licence and that the product is claimed to conform to the relevant Indian Standard, backed by assessment of the manufacturer's testing capability and by product testing. For products under compulsory certification, the mark is legally required before sale.",
+    "keywords": ["isi mark", "standard mark", "consumer", "quality", "licence", "compulsory certification"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-overview/?lang=en",
+    "document_name": "BIS: Product Certification Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "buying-hallmarked-jewellery-checklist",
+    "title": "What to check when buying hallmarked jewellery",
+    "category": "consumer_information",
+    "content": "Based on the BIS Hallmarking FAQ and jewellers page: a hallmarked gold article should carry three marks (BIS logo, purity, and a six-digit HUID); each detachable part and each item in a pair should carry its own HUID; the invoice should state the item description, net weight, purity in carat and fineness, and hallmarking charges; and the jeweller should provide a 10x magnification glass to view the hallmark. The HUID can be checked in the BIS Care App.",
+    "keywords": ["buying gold", "hallmark check", "huid", "invoice", "consumer tips", "jewellery"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "packaged-water-must-carry-bis-mark",
+    "title": "Packaged water sold in India must carry the BIS mark",
+    "category": "consumer_information",
+    "content": "BIS states that no person may manufacture or sell packaged drinking water or packaged natural mineral water in India except under the BIS Certification Mark, under the Food Safety and Standards (Prohibition and Restriction on Sales) Regulation, 2011. A consumer should therefore expect to see the ISI Mark with the IS number (IS 14543 or IS 13428) on the bottle.",
+    "keywords": ["packaged water", "bottled water", "isi mark", "is 14543", "is 13428", "consumer", "food safety"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.services.bis.gov.in/php/BIS_2.0/BISBlog/compulsory-bis-certification-of-packaged-drinking-water-other-than-natural-mineral-water-as-per-is-145432016-packaged-natural-mineral-water-as-per-is-134282005/",
+    "document_name": "BIS Blog: Compulsory BIS Certification of Packaged Drinking Water and Packaged Natural Mineral Water",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  }
+]

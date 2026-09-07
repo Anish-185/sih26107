@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "id": "what-is-bis",
+    "title": "What the Bureau of Indian Standards (BIS) is",
+    "category": "bis_general",
+    "content": "The Bureau of Indian Standards (BIS) is the National Standard Body of India, established under the Bureau of Indian Standards Act, 2016. It succeeded the Indian Standards Institution (ISI), which was set up in 1947. BIS develops and publishes Indian Standards and operates conformity assessment schemes.",
+    "keywords": ["bis", "bureau of indian standards", "national standard body", "isi", "bis act 2016"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/the-bureau/about-the-bureau/",
+    "document_name": "BIS: About the Bureau",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "bis-core-functions",
+    "title": "Main activities of BIS",
+    "category": "bis_general",
+    "content": "According to BIS, its work covers standardization (developing and publishing Indian Standards), conformity assessment and product certification, hallmarking of gold and silver, laboratory testing and laboratory recognition, training, consumer engagement, and representing India in international bodies such as ISO and IEC.",
+    "keywords": ["standardization", "certification", "hallmarking", "testing", "consumer", "iso", "iec"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/the-bureau/about-the-bureau/",
+    "document_name": "BIS: About the Bureau",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "isi-certification-marks-scheme-history",
+    "title": "History of the ISI marking scheme",
+    "category": "bis_general",
+    "content": "BIS states that the Indian Standards Institution started the Certification Marks Scheme under the Indian Standards Institution (Certification Marks) Act, 1952. The scheme was formally launched in 1955 and is popularly known as the 'ISI Marking Scheme'.",
+    "keywords": ["isi mark", "history", "certification marks act 1952", "1955"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-overview/?lang=en",
+    "document_name": "BIS: Product Certification Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "bis-certification-voluntary-and-compulsory",
+    "title": "BIS certification is voluntary except where the government makes it compulsory",
+    "category": "bis_general",
+    "content": "BIS states that its certification scheme is 'basically voluntary in nature'. However, for a number of products the Central Government makes compliance with Indian Standards compulsory through Quality Control Orders (QCOs). For those products the government directs mandatory use of the Standard Mark under a licence or a Certificate of Conformity from BIS.",
+    "keywords": ["voluntary", "compulsory", "mandatory", "qco", "quality control order", "standard mark"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-overview/?lang=en",
+    "document_name": "BIS: Product Certification Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "why-products-are-made-compulsory",
+    "title": "Grounds on which the government makes a standard compulsory",
+    "category": "bis_general",
+    "content": "BIS states that compliance with Indian Standards is made compulsory by the Central Government on considerations such as public interest, protection of human, animal or plant health, safety of the environment, prevention of unfair trade practices, and national security.",
+    "keywords": ["public interest", "health", "safety", "environment", "national security", "qco"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-overview/?lang=en",
+    "document_name": "BIS: Product Certification Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "bis-conformity-assessment-schemes-list",
+    "title": "BIS conformity assessment schemes",
+    "category": "bis_general",
+    "content": "The BIS Product Certification pages describe several schemes: Scheme I (the ISI Mark / Standard Mark scheme), Scheme II (the Registration Scheme, used for the Compulsory Registration Scheme for electronics and IT goods), Scheme IV (Certificate of Conformity), and Scheme X. A separate Foreign Manufacturers Certification Scheme (FMCS) covers manufacturers located outside India.",
+    "keywords": ["scheme i", "scheme ii", "scheme iv", "scheme x", "fmcs", "conformity assessment"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-schemes/",
+    "document_name": "BIS: Product Certification Schemes",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  }
+]

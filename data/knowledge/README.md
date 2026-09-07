@@ -45,9 +45,9 @@ Defined and enforced in `backend/app/knowledge/schema.py`.
   `source_url` and `last_verified`.
 - **`unverified`** — taken from official BIS material but not yet double-checked.
   Still needs `source_url`.
-- **`sample`** — development/demo placeholder. **NOT official BIS data.** The two
-  sample records currently in `indian_standards.json` and `faqs.json` exist only
-  to exercise the loader and must be replaced with real verified content.
+- **`sample`** — development/demo placeholder. **NOT official BIS data.** There are
+  currently no `sample` records; the whole knowledge base is `verified` against
+  official BIS pages (see the Phase 2B report).
 
 ## Rules
 
@@ -63,9 +63,20 @@ cd backend
 ./.venv/bin/python scripts/check_knowledge.py
 ```
 
-Reports valid item counts per category and lists every problem (bad JSON, schema
-violations, duplicate IDs, category/file mismatches) with its exact location. Exit
+Reports valid item counts per category, a verification-status breakdown, the number
+of distinct standard numbers, and lists every problem (bad JSON, schema violations,
+verified items missing traceability, duplicate IDs, duplicate standard numbers
+within `indian_standards`, category/file mismatches) with its exact location. Exit
 code is non-zero when anything is wrong.
+
+### What "verified" means here (Phase 2B)
+
+Each `verified` record was checked against the official BIS page named in its
+`source_url` on the `last_verified` date. Verification used automated retrieval of
+those pages (rendered to text). Several bis.gov.in pages are JavaScript-heavy, and
+the exact catalogue titles/scopes of individual Indian Standards were **not** read
+from the standards catalogue — records say so in their `content`. A human should
+still spot-check before this data is relied on outside the prototype.
 
 ## Migrating to PostgreSQL later
 

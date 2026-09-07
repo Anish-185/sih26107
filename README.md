@@ -11,10 +11,10 @@ See [`CLAUDE.md`](./CLAUDE.md) for the full project rules and roadmap.
 
 ## Status
 
-**Phase 2A — complete.** The knowledge-base structure, schema, validation, and a
-loader exist (JSON files, no database yet). It currently holds only two clearly
-labelled `sample` placeholders. No retrieval, RAG, or LLM yet.
-Next: Phase 2B (add real, verified BIS content).
+**Phase 2B — complete.** The knowledge base holds 89 records (all `verified`
+against official BIS pages) across all 8 categories, including 32 Indian Standards.
+JSON files, no database yet. No retrieval, RAG, or LLM yet.
+Next: Phase 3 (retrieval).
 
 ## Project layout
 

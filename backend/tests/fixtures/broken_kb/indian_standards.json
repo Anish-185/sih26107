@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "dup-standard-a",
+    "title": "First record for IS 9999",
+    "category": "indian_standards",
+    "content": "This record defines standard number IS 9999 and is fine on its own.",
+    "standard_number": "IS 9999",
+    "verification_status": "sample",
+    "source_organization": "N/A — fixture"
+  },
+  {
+    "id": "dup-standard-b",
+    "title": "Second record reusing IS 9999",
+    "category": "indian_standards",
+    "content": "The loader should reject this because 'IS  9999' (same number) is already defined above.",
+    "standard_number": "IS  9999",
+    "verification_status": "sample",
+    "source_organization": "N/A — fixture"
+  }
+]

@@ -151,9 +151,9 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-**Current status: Phase 2A complete — knowledge-base schema, validation, and loader
-exist (JSON files, no database yet), holding only labelled `sample` placeholders.
-Next: Phase 2B (add real verified BIS content).**
+**Current status: Phase 2B complete — knowledge base populated with 89 records
+(all `verified` against official BIS pages) across all 8 categories, incl. 32
+Indian Standards. JSON files, no database yet. Next: Phase 3 (retrieval).**
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -185,6 +185,12 @@ sih26107/
 `data/knowledge/` holds one JSON array file per category. `KnowledgeItem`
 (`backend/app/knowledge/schema.py`) is a flat structure that maps 1:1 to a future
 PostgreSQL row. Rules: unique slug IDs, non-sample items need a `source_url`,
-`indian_standards` items need a `standard_number`, `verified` items need
-`source_url` + `last_verified`. Validate with
+`indian_standards` items need a `standard_number` (unique within that category),
+`verified` items need `source_url` + `last_verified`. Validate with
 `./.venv/bin/python scripts/check_knowledge.py`.
+
+Phase 2B populated it from official BIS pages only (`bis.gov.in`,
+`services.bis.gov.in`). Indian Standards records come mostly from the BIS "Products
+under Compulsory Certification" lists (Scheme I / Scheme II), so they carry BIS's
+own product description, not the verbatim catalogue title — each record's `content`
+states this. Do not treat the dataset as complete BIS coverage.

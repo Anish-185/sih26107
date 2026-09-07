@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "id": "testing-purpose-in-certification",
+    "title": "Why BIS testing is done",
+    "category": "testing",
+    "content": "BIS states that testing in its laboratories is used to verify that manufacturers are capable of producing goods conforming to the relevant Indian Standards on a continuous basis. Testing supports grant of a licence, ongoing surveillance of licensees, and the Compulsory Registration Scheme.",
+    "keywords": ["testing", "conformity", "indian standard", "surveillance", "certification"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/laboratorys/laboratory-services-overview/?lang=en",
+    "document_name": "BIS: Laboratory Services Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "bis-laboratory-network-eight",
+    "title": "BIS operates a network of eight laboratories",
+    "category": "testing",
+    "content": "According to BIS, it has established a network of eight laboratories to support its conformity assessment schemes. Where BIS laboratories do not cover a particular test, testing is carried out in laboratories recognised or empanelled by BIS.",
+    "keywords": ["bis laboratories", "network", "eight laboratories", "testing", "conformity assessment"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/laboratorys/laboratory-services-overview/?lang=en",
+    "document_name": "BIS: Laboratory Services Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "is-wise-test-facilities-lims",
+    "title": "Finding which laboratory can test against a given Indian Standard",
+    "category": "testing",
+    "content": "BIS states that full details of laboratories, their scope of testing and testing charges are available on the BIS LIMS portal (lims.bis.gov.in). The portal provides BIS lab-wise test facilities, recognised lab-wise test facilities, and an IS-wise view of which BIS, recognised or empanelled labs can test against a particular Indian Standard.",
+    "keywords": ["lims", "test facilities", "is-wise", "testing charges", "scope of testing"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/laboratorys/laboratory-services-overview/?lang=en",
+    "document_name": "BIS: Laboratory Services Overview",
+    "reference": "lims.bis.gov.in",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "product-testing-for-crs-registration",
+    "title": "Product testing for CRS registration",
+    "category": "testing",
+    "content": "Under the Compulsory Registration Scheme, a manufacturer must have the product tested by a BIS-recognised laboratory against the applicable Indian Standard. Registration is granted on the basis of that test report; unlike the ISI Mark scheme, CRS does not involve a BIS factory inspection.",
+    "keywords": ["crs", "product testing", "recognised laboratory", "test report", "registration"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/compulsory-registration-scheme/?lang=en",
+    "document_name": "BIS: Compulsory Registration Scheme",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  }
+]

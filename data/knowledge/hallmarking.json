@@ -1,1 +1,146 @@
-[]
+[
+  {
+    "id": "what-is-hallmarking",
+    "title": "What hallmarking is",
+    "category": "hallmarking",
+    "content": "The BIS Hallmarking FAQ states: \"Hallmarking is the accurate determination and official recording of the proportionate content of precious metal in precious metal articles.\" BIS says it protects consumers against malpractice and helps develop India's export competitiveness.",
+    "keywords": ["hallmarking", "definition", "precious metal", "purity", "consumer protection"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "metals-hallmarked-in-india",
+    "title": "Which metals are hallmarked in India",
+    "category": "hallmarking",
+    "content": "According to the BIS Hallmarking FAQ, gold and silver are currently hallmarked in India, under IS 1417:2016 (gold) and IS 2112:2014 (silver), along with the related testing standards IS 1418:2009 and IS 2113:2014. Individual records for these standards are in the indian_standards category.",
+    "keywords": ["gold", "silver", "hallmarking", "is 1417", "is 2112", "is 1418", "is 2113"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "hallmark-components-since-huid",
+    "title": "The three marks that make up a hallmark",
+    "category": "hallmarking",
+    "content": "The BIS Hallmarking FAQ states: \"Since the introduction of HUID (i.e. 1st July 2021) hallmark consists of 3 marks viz, BIS logo, purity of the article in caratage as well as fineness and six-digit alphanumeric HUID number.\"",
+    "keywords": ["hallmark", "bis logo", "purity", "huid", "components", "2021"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "what-is-huid",
+    "title": "What HUID means",
+    "category": "hallmarking",
+    "content": "HUID stands for Hallmark Unique Identification. According to the BIS Hallmarking FAQ it is a six-digit alphanumeric code that is unique to each hallmarked article and allows the article to be traced. A consumer can check it using the BIS Care App.",
+    "keywords": ["huid", "hallmark unique identification", "six digit", "traceability", "bis care app"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "gold-purity-grades-for-hallmarking",
+    "title": "Gold purity grades permitted for hallmarking",
+    "category": "hallmarking",
+    "content": "The BIS Hallmarking FAQ lists the permitted gold caratages for hallmarking as 14K (585), 18K (750), 20K (833), 22K (916), 23K (958) and 24K (995) parts-per-thousand fineness.",
+    "keywords": ["gold purity", "caratage", "fineness", "22k", "18k", "14k", "916"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "hallmarking-charges",
+    "title": "Hallmarking charges for gold and silver articles",
+    "category": "hallmarking",
+    "content": "According to the BIS Hallmarking FAQ, hallmarking charges are Rs. 45 per article for gold (minimum Rs. 200 per consignment) and Rs. 35 per article for silver (minimum Rs. 150 per consignment), with applicable service tax and other levies extra.",
+    "keywords": ["hallmarking charges", "fees", "gold", "silver", "45 rupees", "consignment"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "mandatory-hallmarking-order",
+    "title": "Mandatory hallmarking of gold jewellery and artefacts",
+    "category": "hallmarking",
+    "content": "BIS states that mandatory hallmarking of gold jewellery and gold artefacts is governed by the Hallmarking of Gold Jewellery and Gold Artefacts Order, 2020, and became effective on 23 June 2021. It has been rolled out in phases and progressively extended to additional districts. The order applies to gold in 14, 18, 20, 22, 23 and 24 carat purities.",
+    "keywords": ["mandatory hallmarking", "gold jewellery order 2020", "23 june 2021", "districts", "phases"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/whats_new/mandatory-hallmarking-of-gold-jewellery-artefacts-2/",
+    "document_name": "BIS: Mandatory hallmarking of Gold jewellery/artefacts",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "mandatory-hallmarking-exemptions",
+    "title": "Exemptions from mandatory hallmarking",
+    "category": "hallmarking",
+    "content": "According to BIS, exemptions from mandatory hallmarking include jewellers with an annual turnover up to Rs. 40 lakh, gold jewellery meant for export and re-import as per trade policy, and certain other categories specified under the Quality Control Order. Details are set out in the order and its amendments.",
+    "keywords": ["exemption", "turnover 40 lakh", "export", "mandatory hallmarking", "jeweller"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/whats_new/mandatory-hallmarking-of-gold-jewellery-artefacts-2/",
+    "document_name": "BIS: Mandatory hallmarking of Gold jewellery/artefacts",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "jeweller-registration-free-and-lifetime",
+    "title": "Jeweller registration with BIS is free and valid for lifetime",
+    "category": "hallmarking",
+    "content": "The BIS jewellers page states that a jeweller applies for registration online (through the National Single Window System portal or manakonline.in) and that \"the certificate of registration is granted instantly without the need to pay any fees and the same stands valid for lifetime.\"",
+    "keywords": ["jeweller registration", "free", "instant", "lifetime", "nsws", "manakonline"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-jewellers/?lang=en",
+    "document_name": "BIS: Hallmarking — Jewellers",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "who-must-register-as-a-jeweller",
+    "title": "Which jewellers must register with BIS",
+    "category": "hallmarking",
+    "content": "The BIS jewellers page states that any manufacturer, wholesaler, distributor or retailer engaged in selling hallmarked precious metal (gold/silver) articles has to mandatorily get registered with BIS. It also notes that artisans doing job work may be exempted and that jewellers with an annual turnover up to Rs. 40 lakh are not mandatorily required to register.",
+    "keywords": ["jeweller registration", "retailer", "wholesaler", "manufacturer", "job work", "turnover"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-jewellers/?lang=en",
+    "document_name": "BIS: Hallmarking — Jewellers",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "registered-jeweller-obligations",
+    "title": "Obligations of a BIS-registered jeweller",
+    "category": "hallmarking",
+    "content": "According to BIS, a registered jeweller must get articles hallmarked, ensure the bill/invoice includes item description, net weight, purity in carat and fineness, and hallmarking charges, keep a 10x magnification glass available so a customer can see the hallmark, and cooperate with BIS surveillance officers collecting samples.",
+    "keywords": ["jeweller obligations", "invoice", "bill", "10x magnifier", "surveillance", "net weight"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "consumer-verification-of-hallmark",
+    "title": "How a consumer can check a hallmark",
+    "category": "hallmarking",
+    "content": "According to the BIS Hallmarking FAQ, a consumer can verify the six-digit HUID number of a hallmarked article using the BIS Care App. Each article in a pair and every detachable part must carry its own HUID. Jewellers are required to have a 10x magnification glass so customers can view the hallmark.",
+    "keywords": ["consumer", "verify hallmark", "huid", "bis care app", "10x magnifier", "detachable parts"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  }
+]

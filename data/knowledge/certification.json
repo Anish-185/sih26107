@@ -1,1 +1,122 @@
-[]
+[
+  {
+    "id": "standard-mark-isi-mark",
+    "title": "The Standard Mark (ISI Mark) and how it is granted",
+    "category": "certification",
+    "content": "BIS states that under Scheme I a licence to use the Standard Mark (ISI Mark) on a product is granted to a manufacturer after assessing the manufacturing and testing capabilities of the manufacturer and confirming that the product conforms to the requirements of the relevant Indian Standard(s) through testing.",
+    "keywords": ["standard mark", "isi mark", "scheme i", "licence", "manufacturer", "testing"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-overview/?lang=en",
+    "document_name": "BIS: Product Certification Overview",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "certificate-of-conformity",
+    "title": "Certificate of Conformity (CoC)",
+    "category": "certification",
+    "content": "For some compulsory-certification products the Central Government directs use of the Standard Mark under a Certificate of Conformity (CoC) from BIS instead of a full licence. BIS describes the CoC route as Scheme IV of its conformity assessment schemes.",
+    "keywords": ["certificate of conformity", "coc", "scheme iv", "compulsory certification"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-schemes/",
+    "document_name": "BIS: Product Certification Schemes",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "quality-control-orders",
+    "title": "Quality Control Orders (QCOs)",
+    "category": "certification",
+    "content": "A Quality Control Order (QCO) is a notification issued by the Central Government that makes conformity to one or more Indian Standards, and use of the BIS Standard Mark under a licence or Certificate of Conformity, mandatory for a specified product. BIS publishes the list of products under compulsory certification together with the governing QCOs and their amendments.",
+    "keywords": ["qco", "quality control order", "mandatory", "compulsory certification", "central government"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/scheme-i-mark-scheme/?lang=en",
+    "document_name": "BIS: Products under Compulsory Certification (Scheme I)",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "compulsory-registration-scheme-crs",
+    "title": "Compulsory Registration Scheme (CRS) for electronics and IT goods",
+    "category": "certification",
+    "content": "The Compulsory Registration Scheme (CRS) operates under Scheme II of the BIS conformity assessment schemes and applies to notified electronics and IT goods. Manufacturers apply online through the CRS portal (www.crsbis.in), have their product tested by a BIS-recognised laboratory, and on registration may use the BIS Registration Mark (which is different from the ISI Mark). CRS registration does not involve a BIS factory inspection.",
+    "keywords": ["crs", "compulsory registration scheme", "scheme ii", "electronics", "it goods", "registration mark", "crsbis"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/compulsory-registration-scheme/?lang=en",
+    "document_name": "BIS: Compulsory Registration Scheme",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "foreign-manufacturers-certification-scheme-fmcs",
+    "title": "Foreign Manufacturers Certification Scheme (FMCS)",
+    "category": "certification",
+    "content": "The Foreign Manufacturers Certification Scheme (FMCS) is the route by which manufacturers located outside India obtain a BIS licence to use the Standard Mark on products exported to India. Applications are made online through the BIS portal (manakonline.in), and the scheme has its own guidelines, product coverage and fee structure.",
+    "keywords": ["fmcs", "foreign manufacturers", "imports", "standard mark", "manakonline"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/product-certification-schemes/",
+    "document_name": "BIS: Product Certification Schemes",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "products-under-compulsory-certification-scheme-i",
+    "title": "Products under compulsory certification: Scheme I (ISI Mark)",
+    "category": "certification",
+    "content": "BIS publishes a list of products that require the ISI Mark under a licence (Scheme I) before they can be sold in India. The list is organised by product group (for example cement, household electrical goods, gas cylinders and valves, steel and iron products, automobile tyres and tubes, feeding bottles, clinical thermometers, and certain chemicals) and each entry names the applicable Indian Standard and the governing Quality Control Order.",
+    "keywords": ["compulsory certification", "scheme i", "isi mark", "product list", "qco"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/scheme-i-mark-scheme/?lang=en",
+    "document_name": "BIS: Products under Compulsory Certification (Scheme I)",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "products-under-compulsory-registration-scheme-ii",
+    "title": "Products under compulsory registration: Scheme II (CRS)",
+    "category": "certification",
+    "content": "BIS publishes a list of electronics and IT goods that require BIS registration under the Compulsory Registration Scheme (Scheme II) before they can be sold in India. Many categories (for example laptops, mobile phones, televisions, power banks and set-top boxes) are covered by the safety standard IS/IEC 62368 (Part 1), while lighting, batteries and some appliances are covered by their own Indian Standards.",
+    "keywords": ["crs", "scheme ii", "electronics", "it goods", "is/iec 62368", "registration"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/scheme-ii-registration-scheme/?lang=en",
+    "document_name": "BIS: Products under Compulsory Certification (Scheme II)",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "isi-mark-vs-crs-registration",
+    "title": "Difference between the ISI Mark and CRS registration",
+    "category": "certification",
+    "content": "BIS operates two distinct routes for products under compulsory certification. The ISI Mark (Scheme I) is granted as a licence and involves assessment of the manufacturer's factory and testing capability. CRS registration (Scheme II) applies to notified electronics and IT goods, is based on product testing by a BIS-recognised laboratory, uses the BIS Registration Mark, and does not involve a BIS factory inspection.",
+    "keywords": ["isi mark", "crs", "registration mark", "scheme i", "scheme ii", "difference"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/product-certification/compulsory-registration-scheme/?lang=en",
+    "document_name": "BIS: Compulsory Registration Scheme",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "packaged-drinking-water-certification",
+    "title": "Packaged drinking water and mineral water require BIS certification",
+    "category": "certification",
+    "content": "BIS states that packaged drinking water (other than natural mineral water) as per IS 14543:2016, and packaged natural mineral water as per IS 13428:2005, are under compulsory BIS certification under the Food Safety and Standards (Prohibition and Restriction on Sales) Regulation, 2011. No person may manufacture or sell these products except under the BIS Certification Mark. Licences are granted under Scheme I, and foreign manufacturers apply through FMCS.",
+    "keywords": ["packaged drinking water", "mineral water", "is 14543", "is 13428", "fssai", "compulsory certification"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.services.bis.gov.in/php/BIS_2.0/BISBlog/compulsory-bis-certification-of-packaged-drinking-water-other-than-natural-mineral-water-as-per-is-145432016-packaged-natural-mineral-water-as-per-is-134282005/",
+    "document_name": "BIS Blog: Compulsory BIS Certification of Packaged Drinking Water and Packaged Natural Mineral Water",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  },
+  {
+    "id": "hallmarking-is-a-conformity-assessment-activity",
+    "title": "Hallmarking of gold and silver is a BIS conformity assessment activity",
+    "category": "certification",
+    "content": "In addition to product certification, BIS runs hallmarking for gold and silver articles. Jewellers register with BIS, and articles are tested and marked at BIS-recognised Assaying and Hallmarking Centres. Since 1 July 2021 a hallmark carries the BIS logo, the purity of the article, and a six-digit alphanumeric HUID (Hallmark Unique Identification) number.",
+    "keywords": ["hallmarking", "gold", "silver", "huid", "jeweller registration", "assaying and hallmarking centre"],
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/hallmarking-overview/hallmarking-faqs/hallmarking-faq/?lang=en",
+    "document_name": "BIS: Hallmarking FAQ",
+    "verification_status": "verified",
+    "last_verified": "2026-09-07"
+  }
+]

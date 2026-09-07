@@ -15,6 +15,11 @@ Layout (one file per category):
 Each file holds a JSON array of knowledge items. The filename must match the
 `category` field of every item inside it.
 
+Checks performed: schema validation (required fields, field formats, verified-item
+traceability, indian_standards needs a standard_number), plus loader-level checks
+for invalid JSON, category/file mismatch, duplicate ids, and duplicate standard
+numbers within the indian_standards category.
+
 Run as a script to validate everything:
 
     python -m app.knowledge.loader
@@ -85,6 +90,8 @@ def load_knowledge_base(knowledge_dir: Path | None = None) -> LoadResult:
     knowledge_dir = knowledge_dir or DEFAULT_KNOWLEDGE_DIR
     result = LoadResult()
     seen_ids: dict[str, str] = {}  # id -> file it first appeared in
+    # normalised standard_number -> id that first defined it, for indian_standards only
+    seen_standards: dict[str, str] = {}
 
     if not knowledge_dir.is_dir():
         result.errors.append(
@@ -155,6 +162,24 @@ def load_knowledge_base(knowledge_dir: Path | None = None) -> LoadResult:
                 )
                 continue
 
+            # In the indian_standards category, each standard number must appear
+            # once. (Other categories may *reference* the same standard, so we only
+            # de-duplicate here.)
+            if item.category == Category.INDIAN_STANDARDS.value and item.standard_number:
+                key = " ".join(item.standard_number.split()).upper()
+                if key in seen_standards:
+                    result.errors.append(
+                        LoadError(
+                            rel,
+                            i,
+                            item.id,
+                            f"duplicate standard_number '{item.standard_number}' "
+                            f"(already defined by id '{seen_standards[key]}')",
+                        )
+                    )
+                    continue
+                seen_standards[key] = item.id
+
             seen_ids[item.id] = rel
             result.items.append(item)
 
@@ -171,6 +196,31 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\nValid items: {len(result.items)}")
     for category, count in result.by_category().items():
         print(f"  {category:22} {count}")
+
+    status_counts: dict[str, int] = {}
+    missing_traceability: list[str] = []
+    for item in result.items:
+        status_counts[item.verification_status] = (
+            status_counts.get(item.verification_status, 0) + 1
+        )
+        if item.verification_status == "verified" and not (
+            item.source_url and item.last_verified
+        ):
+            missing_traceability.append(item.id)
+
+    print("\nVerification status:")
+    for status, count in sorted(status_counts.items()):
+        print(f"  {status:22} {count}")
+
+    standards = sorted(
+        {i.standard_number for i in result.items if i.standard_number}
+    )
+    print(f"\nDistinct standard numbers referenced: {len(standards)}")
+
+    if missing_traceability:
+        print("\nWARNING: verified items missing source_url/last_verified:")
+        for item_id in missing_traceability:
+            print(f"  - {item_id}")
 
     if result.errors:
         print(f"\nErrors: {len(result.errors)}")
