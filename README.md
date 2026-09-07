@@ -11,20 +11,22 @@ See [`CLAUDE.md`](./CLAUDE.md) for the full project rules and roadmap.
 
 ## Status
 
-**Phase 2B — complete.** The knowledge base holds 89 records (all `verified`
-against official BIS pages) across all 8 categories, including 32 Indian Standards.
-JSON files, no database yet. No retrieval, RAG, or LLM yet.
-Next: Phase 3 (retrieval).
+**Phase 3 — complete.** Deterministic lexical retrieval over the knowledge base,
+exposed as `GET/POST /search`. No LLM, RAG, embeddings, or database.
+Next: Phase 4 (RAG / AI answers).
 
 ## Project layout
 
 ```
 backend/    Python + FastAPI service
-  app/knowledge/   knowledge-base schema + loader
-  scripts/         check_knowledge.py — validate the knowledge base
-  tests/           plain-Python checks
+  app/knowledge/    knowledge-base schema + loader
+  app/retrieval/    deterministic lexical search (text.py, engine.py)
+  app/api.py        GET/POST /search endpoint
+  app/main.py       FastAPI app (/health, /search)
+  scripts/          check_knowledge.py — validate the knowledge base
+  tests/            plain-Python checks
 data/
-  knowledge/       the BIS knowledge base — one JSON file per category
+  knowledge/        the BIS knowledge base — one JSON file per category
 frontend/   React + Vite app (added when the UI phase begins)
 ```
 
@@ -39,6 +41,40 @@ cd backend
 ```
 
 See [`data/knowledge/README.md`](./data/knowledge/README.md) for the schema and rules.
+
+## Search (Phase 3)
+
+Deterministic keyword retrieval over the knowledge base — no LLM, no embeddings.
+
+```bash
+# with the server running (see below):
+curl "http://127.0.0.1:8000/search?q=what%20is%20HUID"
+curl -X POST http://127.0.0.1:8000/search -H 'content-type: application/json' \
+     -d '{"query": "IS 1786:2008", "limit": 3}'
+```
+
+**How it scores** — each query term is matched against a record's fields and the
+weights are added up (all configurable in `app/retrieval/engine.py`):
+standard-number match 8 (12 if the year also matches), title 4, keyword 3,
+category hint 2, document name 1.5, reference 1, buried content mention 1.
+
+**Confidence** of the top hit, from its total score: `high` ≥ 7.5, `medium` ≥ 4.0,
+`low` ≥ 1.0, else `none`. If the top hit covers less than ~1/3 of the query terms
+the confidence is capped at `low`. When nothing matches, the response has
+`confidence: "none"`, `abstained: true`, and an empty `results` list — the system
+never invents a result.
+
+Every result carries its `matched_terms` and a `reasons` list (which field each
+term matched and its weight), plus the record's `source_url` and
+`verification_status`, so a later phase can build "Why this result?" from real
+signals.
+
+Run the retrieval checks:
+
+```bash
+cd backend
+./.venv/bin/python tests/test_retrieval.py
+```
 
 ## Running the backend
 

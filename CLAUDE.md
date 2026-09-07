@@ -151,9 +151,9 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-**Current status: Phase 2B complete — knowledge base populated with 89 records
-(all `verified` against official BIS pages) across all 8 categories, incl. 32
-Indian Standards. JSON files, no database yet. Next: Phase 3 (retrieval).**
+**Current status: Phase 3 complete — deterministic lexical retrieval
+(`app/retrieval/`) over the 88-record knowledge base, exposed as `GET/POST /search`.
+No LLM/RAG/embeddings/database. Next: Phase 4 (RAG / AI answers).**
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -165,14 +165,19 @@ sih26107/
   README.md            # setup & run instructions
   backend/             # Python + FastAPI service
     app/
-      main.py          # FastAPI app + /health endpoint
+      main.py          # FastAPI app: /health, /search
+      api.py           # GET/POST /search — thin adapter over app.retrieval
       knowledge/       # knowledge-base schema + loader
         schema.py      # KnowledgeItem pydantic model + validation rules
         loader.py      # load + validate data/knowledge/, report every problem
+      retrieval/       # Phase 3: deterministic lexical search (no LLM)
+        text.py        # normalize / tokenize / parse standard numbers
+        engine.py      # SearchEngine, scoring, ranking, confidence, abstention
     scripts/
       check_knowledge.py   # CLI: validate the knowledge base
     tests/
       test_knowledge.py    # plain-Python checks (no test framework)
+      test_retrieval.py    # plain-Python checks for search + /search API
     requirements.txt
     .env.example
   data/
@@ -194,3 +199,14 @@ Phase 2B populated it from official BIS pages only (`bis.gov.in`,
 under Compulsory Certification" lists (Scheme I / Scheme II), so they carry BIS's
 own product description, not the verbatim catalogue title — each record's `content`
 states this. Do not treat the dataset as complete BIS coverage.
+
+### Retrieval (Phase 3)
+
+`app/retrieval/engine.py` — `SearchEngine.search(query)` returns a `SearchOutcome`
+with ranked `RetrievalResult`s. Scoring is a transparent weighted sum over
+`title` / `keywords` / `standard_number` / `category` / `document_name` /
+`reference` / `content`; every point is recorded as a `MatchReason` (for the future
+"Why this result?"). Confidence (`high` / `medium` / `low` / `none`) comes from the
+top hit's score plus query-term coverage; all weights and thresholds live in
+`RetrievalConfig`. `abstained` is true (and `results` empty) when nothing matches.
+The LLM must never generate the match reasons — retrieval produces them.

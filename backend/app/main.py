@@ -1,16 +1,21 @@
 """FastAPI application entry point.
 
-Phase 1 (Foundation): this only exposes a health check so we can confirm the
-backend runs. Retrieval, the knowledge base, and the LLM are added in later phases.
+Exposes:
+  - GET /health         liveness check
+  - GET/POST /search    deterministic lexical retrieval over the BIS knowledge base
+
+The LLM / RAG layer is added in a later phase.
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import router as search_router
+
 app = FastAPI(
     title="BIS Assistant API",
     description="Evidence-backed AI assistant for Indian Standards and BIS services.",
-    version="0.1.0",
+    version="0.2.0",
 )
 
 # The frontend (added in a later phase) will run on a different port during
@@ -29,4 +34,7 @@ app.add_middleware(
 @app.get("/health")
 def health() -> dict:
     """Liveness check. Returns 200 with a small JSON body when the API is up."""
-    return {"status": "ok", "service": "bis-assistant-api", "version": "0.1.0"}
+    return {"status": "ok", "service": "bis-assistant-api", "version": "0.2.0"}
+
+
+app.include_router(search_router)
