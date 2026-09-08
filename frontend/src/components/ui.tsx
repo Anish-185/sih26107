@@ -14,10 +14,10 @@ import { confidenceFill, confidenceLabel } from "@/lib/format";
 /* ---------------------------------------------------------------- Button --- */
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
-type ButtonSize = "sm" | "md";
+type ButtonSize = "sm" | "md" | "lg";
 
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 font-medium rounded-sm " +
+  "group/btn relative inline-flex items-center justify-center gap-2 font-medium rounded-sm " +
   "transition-colors duration-150 disabled:opacity-45 disabled:pointer-events-none " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
@@ -25,14 +25,30 @@ const buttonVariants: Record<ButtonVariant, string> = {
   primary:
     "bg-accent text-white hover:bg-accent-hover border border-transparent",
   secondary:
-    "bg-raised text-ink border border-line-strong hover:border-ink hover:bg-surface",
+    "bg-surface text-ink border border-line-strong hover:border-ink hover:bg-raised",
   ghost: "bg-transparent text-ink-soft hover:text-ink hover:bg-surface",
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
   sm: "h-8 px-3 text-[12px]",
   md: "h-10 px-4 text-[13px]",
+  lg: "h-12 px-5 text-[13px] font-mono uppercase tracking-[0.14em]",
 };
+
+/* Corner brackets that read on the secondary / lg buttons — the reference's
+   signature affordance. Rendered as four absolutely-positioned marks. */
+function ButtonBrackets() {
+  const c =
+    "pointer-events-none absolute h-1.5 w-1.5 border-line-strong transition-colors group-hover/btn:border-ink";
+  return (
+    <span aria-hidden>
+      <span className={cn(c, "-left-[3px] -top-[3px] border-l border-t")} />
+      <span className={cn(c, "-right-[3px] -top-[3px] border-r border-t")} />
+      <span className={cn(c, "-bottom-[3px] -left-[3px] border-b border-l")} />
+      <span className={cn(c, "-bottom-[3px] -right-[3px] border-b border-r")} />
+    </span>
+  );
+}
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -40,15 +56,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = "primary", size = "md", className, ...props },
+  { variant = "primary", size = "md", className, children, ...props },
   ref,
 ) {
+  const brackets = variant === "secondary" || (size === "lg" && variant !== "primary");
   return (
     <button
       ref={ref}
       className={cn(buttonBase, buttonVariants[variant], buttonSizes[size], className)}
       {...props}
-    />
+    >
+      {brackets && <ButtonBrackets />}
+      {children}
+    </button>
   );
 });
 
@@ -65,11 +85,13 @@ export function LinkButton({
   size?: ButtonSize;
   className?: string;
 }) {
+  const brackets = variant === "secondary" || (size === "lg" && variant !== "primary");
   return (
     <Link
       to={to}
       className={cn(buttonBase, buttonVariants[variant], buttonSizes[size], className)}
     >
+      {brackets && <ButtonBrackets />}
       {children}
     </Link>
   );
@@ -270,6 +292,70 @@ export function SectionHeading({
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------- PageHeader --- */
+
+/**
+ * The editorial header used at the top of every view: a mono eyebrow, an
+ * oversized display title, an optional lead paragraph and right-rail
+ * annotation, closed by a hairline rule with an end tick. This is what gives
+ * the app one consistent, art-directed voice.
+ */
+export function PageHeader({
+  eyebrow,
+  title,
+  lead,
+  annotation,
+  actions,
+  size = "lg",
+}: {
+  eyebrow: string;
+  title: ReactNode;
+  lead?: ReactNode;
+  annotation?: ReactNode;
+  actions?: ReactNode;
+  size?: "lg" | "xl";
+}) {
+  return (
+    <header className="relative">
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-3">
+            <span className="eyebrow">{eyebrow}</span>
+            <span className="h-px w-8 bg-accent/40" aria-hidden />
+          </div>
+          <h1
+            className={cn(
+              "display mt-4 break-words",
+              size === "xl"
+                ? "text-[2rem] sm:text-[2.6rem] lg:text-[3.4rem]"
+                : "text-[1.75rem] sm:text-[2.1rem] lg:text-[2.6rem]",
+            )}
+          >
+            {title}
+          </h1>
+          {lead && (
+            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ink-soft">
+              {lead}
+            </p>
+          )}
+        </div>
+        {(annotation || actions) && (
+          <div className="flex shrink-0 flex-col items-start gap-3 md:items-end">
+            {annotation && (
+              <div className="text-right text-ink-faint">{annotation}</div>
+            )}
+            {actions && <div className="flex items-center gap-2">{actions}</div>}
+          </div>
+        )}
+      </div>
+      <div className="mt-8 flex items-center gap-3" aria-hidden>
+        <span className="h-1.5 w-1.5 shrink-0 border border-line-strong" />
+        <span className="h-px flex-1 bg-line" />
+      </div>
+    </header>
   );
 }
 

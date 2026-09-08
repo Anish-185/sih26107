@@ -4,13 +4,17 @@ import { useAsyncTask } from "@/lib/hooks";
 import {
   Button,
   Callout,
-  EmptyState,
   InlineLoading,
   Mono,
-  Panel,
-  SectionHeading,
+  PageHeader,
   TextInput,
 } from "@/components/ui";
+import {
+  Annotation,
+  BlueprintField,
+  Bracket,
+  PhotoFragment,
+} from "@/components/decor";
 import { GroundedAnswer } from "@/components/GroundedAnswer";
 import { ErrorNote } from "@/features/StandardsView";
 
@@ -35,30 +39,33 @@ export function LaboratoriesView() {
   const res = task.data;
 
   return (
-    <div className="space-y-10">
-      <SectionHeading
-        kicker="Laboratory search"
+    <div className="space-y-12">
+      <PageHeader
+        eyebrow="Laboratory search"
         title="BIS-recognized testing laboratories"
-        description="MetrIQ does not hold individual laboratory records. It points to BIS's official recognised / empanelled-laboratory lists and the LIMS portal, and abstains rather than fabricate laboratory data."
+        lead="MetrIQ does not hold individual laboratory records. It points to BIS's official recognised / empanelled-laboratory lists and the LIMS portal, and abstains rather than fabricate laboratory data."
+        annotation={<Annotation lead="right">Directories · not lab records</Annotation>}
       />
 
       <Callout>
-        This search returns BIS's official laboratory <em>directories</em> and
-        the IS-wise LIMS portal — not specific laboratory names, addresses or
+        This search returns BIS's official laboratory <em>directories</em> and the
+        IS-wise LIMS portal — not specific laboratory names, addresses or
         accreditation records.
       </Callout>
 
-      <Panel flush>
-        <form onSubmit={submit} className="flex flex-col gap-3 p-4">
+      <div className="relative border border-line bg-raised">
+        <Bracket tone="accent" />
+        <form onSubmit={submit} className="flex flex-col gap-4 p-5 sm:p-6">
           <TextInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="e.g. BIS recognised laboratory for testing steel"
+            className="h-11"
             autoFocus
           />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1">
-              <label className="kicker mb-1.5 block">
+              <label className="kicker mb-2 block">
                 Standard / product <span className="normal-case">(optional)</span>
               </label>
               <TextInput
@@ -67,7 +74,7 @@ export function LaboratoriesView() {
                 placeholder="e.g. IS 1786"
               />
             </div>
-            <Button type="submit" disabled={task.loading || !query.trim()}>
+            <Button type="submit" size="lg" disabled={task.loading || !query.trim()}>
               {task.loading ? <InlineLoading label="Searching" /> : "Search"}
             </Button>
           </div>
@@ -81,7 +88,7 @@ export function LaboratoriesView() {
             Explain the evidence with the local model
             <span className="text-ink-faint">(slower)</span>
           </label>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
             <span className="kicker mr-1">Try</span>
             {EXAMPLES.map((ex) => (
               <button
@@ -91,14 +98,14 @@ export function LaboratoriesView() {
                   setQuery(ex);
                   task.run(ex, "", explain).catch(() => {});
                 }}
-                className="rounded-xs border border-line bg-surface px-2 py-1 font-mono text-[11px] text-ink-soft hover:border-ink hover:text-ink"
+                className="border border-line bg-surface px-2 py-1 font-mono text-[11px] text-ink-soft transition-colors hover:border-ink hover:text-ink"
               >
                 {ex}
               </button>
             ))}
           </div>
         </form>
-      </Panel>
+      </div>
 
       {task.error != null && <ErrorNote error={task.error} />}
 
@@ -124,10 +131,22 @@ export function LaboratoriesView() {
       )}
 
       {!res && task.error == null && !task.loading && (
-        <EmptyState
-          title="No search yet"
-          description="Results link to BIS's official recognised-laboratory lists and the LIMS portal (lims.bis.gov.in)."
-        />
+        <div className="relative overflow-hidden border border-dashed border-line-strong bg-surface p-10">
+          <BlueprintField fade="radial" />
+          <PhotoFragment
+            src="/blue-botanical.png"
+            className="absolute inset-y-0 right-0 hidden h-full w-[46%] object-cover object-left opacity-[0.2] [mask-image:linear-gradient(to_left,#000,transparent)] md:block"
+          />
+          <Bracket tone="line" className="-inset-2" />
+          <div className="relative max-w-md">
+            <Annotation className="mb-3 inline-flex">Awaiting query</Annotation>
+            <div className="text-[15px] font-medium">No search yet</div>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
+              Results link to BIS's official recognised-laboratory lists and the
+              LIMS portal (lims.bis.gov.in).
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

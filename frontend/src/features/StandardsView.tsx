@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { Search } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
 import { ApiError, api, type ProductStandardResult } from "@/lib/api";
 import { useAsyncTask } from "@/lib/hooks";
 import { standardTitle } from "@/lib/format";
@@ -8,13 +8,17 @@ import {
   Callout,
   Chip,
   ConfidenceMeter,
-  EmptyState,
   InlineLoading,
   Mono,
-  Panel,
-  SectionHeading,
+  PageHeader,
   TextInput,
 } from "@/components/ui";
+import {
+  Annotation,
+  BlueprintField,
+  Bracket,
+  PhotoFragment,
+} from "@/components/decor";
 
 const EXAMPLES = [
   "stainless steel water bottle",
@@ -36,30 +40,39 @@ export function StandardsView() {
   const res = task.data;
 
   return (
-    <div className="space-y-10">
-      <SectionHeading
-        kicker="Product → Standard"
+    <div className="space-y-12">
+      <PageHeader
+        eyebrow="Product → Standard · Flagship"
         title="Find the Indian Standard for a product"
-        description="Describe a product in plain words. MetrIQ runs deterministic retrieval over the BIS knowledge base and only returns a standard when the retrieved evidence actually describes that product."
+        lead="Describe a product in plain words. MetrIQ runs deterministic retrieval over the curated BIS knowledge base and only returns a standard when the retrieved evidence actually describes that product."
+        annotation={
+          <div className="flex flex-col gap-1">
+            <Annotation lead="right">Retrieval → Evidence</Annotation>
+            <Annotation lead="right">Deterministic · no LLM</Annotation>
+          </div>
+        }
+        size="xl"
       />
 
-      <Panel flush>
-        <form onSubmit={submit} className="flex flex-col gap-3 p-4 sm:flex-row">
+      {/* search — the flagship affordance */}
+      <div className="relative border border-line bg-raised">
+        <span className="absolute inset-y-0 left-0 w-[2px] bg-accent" aria-hidden />
+        <form onSubmit={submit} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:p-5">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
             <TextInput
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="e.g. stainless steel water bottle"
-              className="pl-9"
+              className="h-11 pl-9"
               autoFocus
             />
           </div>
-          <Button type="submit" disabled={task.loading || !query.trim()}>
-            {task.loading ? <InlineLoading label="Retrieving" /> : "Search"}
+          <Button type="submit" size="lg" disabled={task.loading || !query.trim()}>
+            {task.loading ? <InlineLoading label="Retrieving" /> : "Retrieve"}
           </Button>
         </form>
-        <div className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-3">
+        <div className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-3 sm:px-5">
           <span className="kicker mr-1">Try</span>
           {EXAMPLES.map((ex) => (
             <button
@@ -69,37 +82,38 @@ export function StandardsView() {
                 setQuery(ex);
                 task.run(ex).catch(() => {});
               }}
-              className="rounded-xs border border-line bg-surface px-2 py-1 font-mono text-[11px] text-ink-soft hover:border-ink hover:text-ink"
+              className="border border-line bg-surface px-2 py-1 font-mono text-[11px] text-ink-soft transition-colors hover:border-ink hover:text-ink"
             >
               {ex}
             </button>
           ))}
         </div>
-      </Panel>
+      </div>
 
       {task.loading && (
-        <p className="text-[12px] text-ink-faint">
+        <p className="flex items-center gap-2 text-[12px] text-ink-faint">
+          <span className="h-1 w-1 animate-pulse bg-accent" />
           Running deterministic retrieval over the BIS knowledge base…
         </p>
       )}
       {task.error != null && <ErrorNote error={task.error} />}
 
       {res && (
-        <section className="space-y-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="text-[15px] font-semibold tracking-tight">
-              {res.grounded ? "Relevant standards" : "No standard returned"}
-            </h2>
-            <div className="flex items-center gap-3">
-              <Mono muted className="text-[12px]">
-                query: “{res.product}”
-              </Mono>
-              <ConfidenceMeter confidence={res.confidence} />
+        <section className="space-y-6">
+          <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-3">
+            <div>
+              <span className="eyebrow !text-ink-faint">
+                {res.grounded ? "Candidate standards" : "No standard returned"}
+              </span>
+              <h2 className="display mt-2 text-xl">
+                query <span className="text-accent">“{res.product}”</span>
+              </h2>
             </div>
+            <ConfidenceMeter confidence={res.confidence} />
           </div>
 
           {res.grounded ? (
-            <ol className="grid gap-px border border-line bg-line">
+            <ol className="space-y-4">
               {res.results.map((r, i) => (
                 <StandardResult key={r.id} result={r} rank={i + 1} />
               ))}
@@ -114,10 +128,24 @@ export function StandardsView() {
       )}
 
       {!res && task.error == null && !task.loading && (
-        <EmptyState
-          title="No search yet"
-          description="Results appear here with the matched terms and the retrieval reasons behind each candidate standard."
-        />
+        <div className="relative overflow-hidden border border-dashed border-line-strong bg-surface p-10">
+          <BlueprintField fade="radial" />
+          {/* blue photographic sliver — a research-desk fragment at the edge */}
+          <PhotoFragment
+            src="/blue-botanical-strip.png"
+            className="absolute right-0 top-0 hidden h-full w-[34%] object-cover object-right opacity-[0.22] [mask-image:linear-gradient(to_left,#000,transparent)] sm:block"
+          />
+          <Bracket tone="line" className="-inset-2" />
+          <div className="relative max-w-md">
+            <Annotation className="mb-3 inline-flex">Awaiting query</Annotation>
+            <div className="text-[15px] font-medium">No search yet</div>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
+              Results appear here as ranked candidate standards — each with its
+              matched terms, the scored retrieval signals behind it, and the
+              official BIS source.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -135,36 +163,39 @@ function StandardResult({
     .slice(0, 4);
 
   return (
-    <li className="bg-raised p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <li className="group relative border border-line bg-raised transition-colors hover:border-line-strong">
+      {rank === 1 && (
+        <span className="absolute inset-y-0 left-0 w-[2px] bg-accent" aria-hidden />
+      )}
+      <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <Mono muted className="text-[11px]">
+          <div className="flex items-center gap-3">
+            <Mono muted className="text-[11px] tabular-nums">
               {String(rank).padStart(2, "0")}
             </Mono>
-            <Mono className="text-[15px] font-semibold">
+            <Mono className="text-[15px] font-semibold text-accent">
               {result.standard_number}
             </Mono>
           </div>
-          <h3 className="mt-1 text-[15px] font-medium text-ink">
+          <h3 className="display mt-2 text-[1.35rem] leading-tight">
             {standardTitle(result.title)}
           </h3>
-          <p className="mt-1 text-[12px] text-ink-faint">
+          <p className="mt-2 text-[12px] text-ink-faint">
             {result.source_organization}
             {result.document_name ? ` · ${result.document_name}` : ""}
             {result.last_verified ? ` · verified ${result.last_verified}` : ""}
           </p>
         </div>
-        <div className="shrink-0 text-right">
+        <div className="flex shrink-0 flex-row items-center gap-4 sm:flex-col sm:items-end">
           <ConfidenceMeter confidence={result.confidence} />
-          <Mono muted className="mt-1 block text-[11px]">
+          <Mono muted className="text-[11px]">
             score {result.score.toFixed(1)}
           </Mono>
         </div>
       </div>
 
       {result.matched_terms.length > 0 && (
-        <div className="mt-4 flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-line px-5 py-3 sm:px-6">
           <span className="kicker mr-1">Matched</span>
           {result.matched_terms.map((t) => (
             <Chip key={t} tone="accent">
@@ -174,30 +205,30 @@ function StandardResult({
         </div>
       )}
 
-      <div className="mt-4 border-t border-line pt-3">
-        <div className="kicker mb-2">Why this result</div>
+      <div className="border-t border-line bg-surface px-5 py-4 sm:px-6">
+        <div className="eyebrow mb-2 !text-ink-faint">Why this result</div>
         {result.why?.summary && (
-          <p className="text-[13px] leading-relaxed text-ink">
+          <p className="max-w-2xl text-[13px] leading-relaxed text-ink">
             {result.why.summary}
           </p>
         )}
         {topReasons.length > 0 && (
           <>
-            <div className="kicker mb-2 mt-3">Retrieval signals</div>
-            <ul className="space-y-1.5">
+            <div className="kicker mb-2 mt-4">Retrieval signals</div>
+            <ul className="divide-y divide-line border-y border-line">
               {topReasons.map((reason, i) => (
                 <li
                   key={`${reason.field}-${reason.term}-${i}`}
-                  className="flex items-baseline gap-2 text-[12px] text-ink-soft"
+                  className="flex items-baseline gap-3 py-2 text-[12px] text-ink-soft"
                 >
-                  <Mono muted className="w-24 shrink-0 text-[11px] uppercase">
+                  <Mono muted className="w-24 shrink-0 text-[10px] uppercase tracking-[0.1em]">
                     {reason.field}
                   </Mono>
-                  <span>
+                  <span className="min-w-0 flex-1">
                     term <Mono>{reason.term}</Mono>
                     {reason.detail ? ` — ${reason.detail}` : ""}
                   </span>
-                  <Mono muted className="ml-auto text-[11px]">
+                  <Mono className="shrink-0 text-[11px] text-accent">
                     +{reason.weight}
                   </Mono>
                 </li>
@@ -205,18 +236,18 @@ function StandardResult({
             </ul>
           </>
         )}
+        {result.source_url && (
+          <a
+            href={result.source_url}
+            target="_blank"
+            rel="noreferrer"
+            className="group/src mt-4 inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:text-accent-hover"
+          >
+            Official BIS source
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/src:translate-x-0.5" />
+          </a>
+        )}
       </div>
-
-      {result.source_url && (
-        <a
-          href={result.source_url}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex text-[12px] font-medium text-accent hover:text-accent-hover"
-        >
-          Official BIS source →
-        </a>
-      )}
     </li>
   );
 }

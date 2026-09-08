@@ -12,12 +12,19 @@ import {
   DefinitionRow,
   LinkButton,
   Mono,
+  PageHeader,
   Panel,
   PanelHeader,
   SectionHeading,
   StatusBadge,
 } from "@/components/ui";
 import { Dropzone } from "@/components/Dropzone";
+import {
+  Annotation,
+  BlueprintField,
+  Bracket,
+  PhotoFragment,
+} from "@/components/decor";
 import { ImageInspector } from "./ImageInspector";
 import {
   ACTIVE_MOCK_INSPECTION,
@@ -76,27 +83,50 @@ export function InspectionView() {
 
   if (phase === "upload") {
     return (
-      <div className="space-y-10">
-        <SectionHeading
-          kicker="Inspection"
+      <div className="space-y-12">
+        <PageHeader
+          eyebrow="Inspection"
           title="Start an inspection"
-          description="Upload one or more images of the product package. MetrIQ extracts the declared values, retrieves the applicable Indian Standard, and runs the legal-metrology rule checks."
+          lead="Upload one or more images of the product package. MetrIQ extracts the declared values, retrieves the applicable Indian Standard, and runs the legal-metrology rule checks."
+          annotation={<Annotation lead="right">Capture → Extract → Match → Review</Annotation>}
         />
-        <Dropzone onFiles={start} />
-        <div className="grid gap-px border border-line bg-line sm:grid-cols-3">
+
+        {/* process strip — the pipeline as an intentional diagram */}
+        <ol className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4">
           {[
-            ["1", "Capture", "Front-of-pack and declaration panel"],
-            ["2", "Extract & match", "OCR values → product → standard"],
-            ["3", "Review", "Officer verifies each finding"],
-          ].map(([n, t, d]) => (
-            <div key={n} className="bg-raised p-5">
-              <Mono muted className="text-[11px]">
-                {n}
-              </Mono>
-              <div className="mt-1.5 text-[13px] font-medium">{t}</div>
-              <div className="mt-1 text-[12px] text-ink-faint">{d}</div>
-            </div>
+            ["01", "Capture", "Package & declaration panel"],
+            ["02", "Extract", "OCR declared values"],
+            ["03", "Match", "Product → Indian Standard"],
+            ["04", "Review", "Officer verifies each finding"],
+          ].map(([n, t, d], i) => (
+            <li key={n} className="relative bg-raised p-5">
+              <div className="flex items-center gap-2">
+                <Mono className="text-[11px] text-accent">{n}</Mono>
+                {i < 3 && (
+                  <span className="hidden h-px flex-1 bg-line sm:block" aria-hidden />
+                )}
+              </div>
+              <div className="mt-3 text-[13px] font-semibold">{t}</div>
+              <div className="mt-1 text-[12px] leading-snug text-ink-faint">{d}</div>
+            </li>
           ))}
+        </ol>
+
+        <div className="relative overflow-hidden">
+          <BlueprintField fade="radial" />
+          {/* a blue photographic margin down the left edge of the upload zone */}
+          <PhotoFragment
+            src="/blue-botanical.png"
+            blend="multiply"
+            className="absolute inset-y-0 left-0 hidden w-10 object-cover object-left opacity-30 sm:block md:w-16"
+          />
+          <Bracket tone="accent" className="-inset-2" />
+          <div className="relative">
+            <Dropzone onFiles={start} />
+          </div>
+          <Annotation className="absolute -bottom-6 right-0">
+            PNG · JPG · WEBP
+          </Annotation>
         </div>
       </div>
     );
@@ -105,7 +135,10 @@ export function InspectionView() {
   if (phase === "analyzing") {
     return (
       <div className="mx-auto max-w-lg space-y-8 py-16">
-        <div className="kicker">Analysing package</div>
+        <div className="flex items-center gap-3">
+          <span className="eyebrow">Analysing package</span>
+          <span className="h-px w-8 bg-accent/40" aria-hidden />
+        </div>
         <ul className="space-y-3">
           {STEPS.map((label, i) => {
             const done = i < step;

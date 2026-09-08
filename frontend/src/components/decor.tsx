@@ -1,0 +1,346 @@
+import type { CSSProperties, ReactNode } from "react";
+import { cn } from "@/lib/cn";
+
+/*
+  MetrIQ decorative system.
+
+  One coherent visual language layered on top of the Phase 7 design system
+  (warm paper, charcoal structure, one cobalt accent, 1px borders). Every
+  export here is presentational: aria-hidden, pointer-events-none, and safe to
+  drop or scale away on small screens. Nothing here touches data, routing or
+  behaviour.
+
+  Vocabulary:
+    BlueprintField  faint measurement grid behind large empty areas
+    Bracket         technical corner brackets framing a surface
+    Ticks           short measurement ticks along an edge
+    SquareField     a composed scatter of cobalt squares + connector lines
+    Annotation      a small mono diagram label, optionally with a lead line
+    Figurine        the institutional figurine — a faceted Ashoka Lion Capital
+    DigitHalftone   a field of mono digits forming a halftone gradient
+*/
+
+/* --------------------------------------------------------- BlueprintField --- */
+
+export function BlueprintField({
+  className,
+  drift = false,
+  fade = "radial",
+  variant = "grid",
+}: {
+  className?: string;
+  drift?: boolean;
+  fade?: "radial" | "bottom" | "none";
+  variant?: "grid" | "dots";
+}) {
+  const mask =
+    fade === "radial"
+      ? "radial-gradient(120% 120% at 72% 24%, #000 26%, transparent 82%)"
+      : fade === "bottom"
+        ? "linear-gradient(#000, transparent)"
+        : undefined;
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute inset-0 overflow-hidden",
+        className,
+      )}
+      aria-hidden
+      style={mask ? { maskImage: mask, WebkitMaskImage: mask } : undefined}
+    >
+      <div
+        className={cn(
+          variant === "dots" ? "dot-field" : "blueprint-field",
+          "absolute inset-0",
+          drift && "metriq-drift",
+        )}
+      />
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------- Bracket --- */
+
+/** Technical corner brackets. Pass a negative inset (e.g. "-inset-2") to
+ *  frame around an element rather than on its edge. */
+export function Bracket({
+  className,
+  tone = "accent",
+  size = "md",
+}: {
+  className?: string;
+  tone?: "accent" | "line";
+  size?: "sm" | "md";
+}) {
+  const dim = size === "sm" ? "h-2 w-2" : "h-3 w-3";
+  const color = tone === "accent" ? "border-accent/50" : "border-line-strong";
+  const corner = cn("absolute", dim, color);
+  return (
+    <div
+      className={cn("pointer-events-none absolute", className ?? "inset-0")}
+      aria-hidden
+    >
+      <span className={cn(corner, "left-0 top-0 border-l border-t")} />
+      <span className={cn(corner, "right-0 top-0 border-r border-t")} />
+      <span className={cn(corner, "bottom-0 left-0 border-b border-l")} />
+      <span className={cn(corner, "bottom-0 right-0 border-b border-r")} />
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------- Ticks --- */
+
+/** A short run of measurement ticks along one edge. */
+export function Ticks({
+  edge = "top",
+  count = 9,
+  className,
+}: {
+  edge?: "top" | "bottom" | "left" | "right";
+  count?: number;
+  className?: string;
+}) {
+  const horizontal = edge === "top" || edge === "bottom";
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute flex",
+        horizontal ? "left-0 right-0 justify-between" : "bottom-0 top-0 flex-col justify-between",
+        edge === "top" && "top-0",
+        edge === "bottom" && "bottom-0",
+        edge === "left" && "left-0",
+        edge === "right" && "right-0",
+        className,
+      )}
+    >
+      {Array.from({ length: count }).map((_, i) => (
+        <span
+          key={i}
+          className={cn(
+            "bg-line-strong",
+            horizontal ? "w-px" : "h-px",
+            horizontal ? (i % 3 === 0 ? "h-2" : "h-1") : i % 3 === 0 ? "w-2" : "w-1",
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------ SquareField --- */
+
+type Sq = { x: number; y: number; s: number; v: "solid" | "mid" | "soft" | "outline" };
+
+/**
+ * A composed scatter of cobalt squares with faint connector lines — the
+ * "evidence chips trailing toward the object" motif. Percent coordinates so it
+ * scales with its container. Give the container `position: relative`.
+ */
+export function SquareField({
+  squares,
+  connect = true,
+  className,
+}: {
+  squares: Sq[];
+  connect?: boolean;
+  className?: string;
+}) {
+  const fill: Record<Sq["v"], string> = {
+    solid: "bg-accent/80",
+    mid: "bg-accent/40",
+    soft: "bg-accent/15",
+    outline: "border border-accent/45",
+  };
+  return (
+    <div
+      aria-hidden
+      className={cn("pointer-events-none absolute inset-0 overflow-visible", className)}
+    >
+      {connect && squares.length > 1 && (
+        <svg
+          className="absolute inset-0 h-full w-full"
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+        >
+          <polyline
+            points={squares.map((q) => `${q.x},${q.y}`).join(" ")}
+            fill="none"
+            stroke="rgba(34,70,239,0.22)"
+            strokeWidth="0.25"
+            strokeDasharray="1 1.4"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      )}
+      {squares.map((q, i) => (
+        <span
+          key={i}
+          className={cn("absolute block", fill[q.v])}
+          style={{
+            left: `${q.x}%`,
+            top: `${q.y}%`,
+            width: q.s,
+            height: q.s,
+            transform: "translate(-50%,-50%)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** A single positioned square marker (for one-off accents). */
+export function Square({
+  className,
+  variant = "solid",
+  size = 8,
+  style,
+}: {
+  className?: string;
+  variant?: "solid" | "mid" | "soft" | "outline" | "tick";
+  size?: number;
+  style?: CSSProperties;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute block",
+        variant === "solid" && "bg-accent/80",
+        variant === "mid" && "bg-accent/40",
+        variant === "soft" && "bg-accent/15",
+        variant === "outline" && "border border-accent/45",
+        variant === "tick" &&
+          "border border-accent/45 after:absolute after:left-1/2 after:top-1/2 after:h-px after:w-1.5 after:-translate-x-1/2 after:-translate-y-1/2 after:bg-accent/55",
+        className,
+      )}
+      style={{ width: size, height: size, ...style }}
+    />
+  );
+}
+
+/* -------------------------------------------------------------- Annotation --- */
+
+/** A small mono diagram label. `lead` draws a short connector line. */
+export function Annotation({
+  children,
+  lead,
+  className,
+}: {
+  children: ReactNode;
+  lead?: "left" | "right";
+  className?: string;
+}) {
+  const line = <span className="h-px w-7 shrink-0 bg-accent/45" aria-hidden />;
+  return (
+    <span
+      className={cn(
+        "annotation inline-flex items-center gap-2 whitespace-nowrap",
+        className,
+      )}
+    >
+      {lead === "left" && line}
+      {children}
+      {lead === "right" && line}
+    </span>
+  );
+}
+
+/* ---------------------------------------------------------------- Figurine --- */
+
+/**
+ * The MetrIQ institutional figurine — the actual blue-toned Ashoka Lion Capital
+ * artwork from the project reference set (`public/lion-capital.png`, background
+ * knocked out to transparent). Treated as editorial artwork: `multiply` blends
+ * its anti-aliased edge into the warm paper so it reads as printed, not pasted.
+ * Position / crop / bleed via `className` at the call site.
+ */
+export function Figurine({ className }: { className?: string }) {
+  return (
+    <img
+      src="/lion-capital.png"
+      alt=""
+      aria-hidden
+      draggable={false}
+      className={cn("pointer-events-none select-none", className)}
+      style={{ mixBlendMode: "multiply" }}
+    />
+  );
+}
+
+/* Back-compat alias. */
+export const LionCapitalMark = Figurine;
+
+/* ------------------------------------------------------------ PhotoFragment --- */
+
+/**
+ * A cropped fragment of one of the project's blue photographic assets, used as
+ * visual punctuation — a narrow strip, an edge bleed, a background sliver. Not
+ * a card image. `blend` integrates it with whatever it sits on.
+ */
+export function PhotoFragment({
+  src,
+  className,
+  blend = "normal",
+  opacity,
+  style,
+}: {
+  src: string;
+  className?: string;
+  blend?: "normal" | "multiply" | "screen" | "luminosity" | "soft-light";
+  opacity?: number;
+  style?: CSSProperties;
+}) {
+  return (
+    <img
+      src={src}
+      alt=""
+      aria-hidden
+      draggable={false}
+      className={cn(
+        "pointer-events-none select-none object-cover",
+        className,
+      )}
+      style={{
+        mixBlendMode: blend === "normal" ? undefined : blend,
+        opacity,
+        ...style,
+      }}
+    />
+  );
+}
+
+/* ------------------------------------------------------------- DigitHalftone --- */
+
+const DIGIT_ROWS = 14;
+const DIGIT_COLS = 60;
+
+/**
+ * A field of monospace digits whose density/brightness rises left→right,
+ * forming a halftone gradient. Sits inside the (already blue) system-layer
+ * footer. Decorative; the digits carry no meaning.
+ */
+export function DigitHalftone({ className }: { className?: string }) {
+  const rows: string[] = [];
+  for (let r = 0; r < DIGIT_ROWS; r++) {
+    let line = "";
+    for (let c = 0; c < DIGIT_COLS; c++) {
+      const t = c / DIGIT_COLS;
+      const jitter = ((r * 7 + c * 13) % 11) / 11;
+      line += t + jitter * 0.5 > 0.7 ? String((r * 3 + c * 7) % 10) : " ";
+    }
+    rows.push(line);
+  }
+  return (
+    <pre
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute bottom-0 right-0 select-none overflow-hidden font-mono text-[9px] leading-[11px] text-white/25",
+        className,
+      )}
+    >
+      {rows.join("\n")}
+    </pre>
+  );
+}

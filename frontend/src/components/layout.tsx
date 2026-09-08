@@ -10,6 +10,7 @@ import { api } from "@/lib/api";
 import { useOnMount } from "@/lib/hooks";
 import { cn } from "@/lib/cn";
 import { Mono } from "@/components/ui";
+import { DigitHalftone } from "@/components/decor";
 
 const NAV = [
   { to: "/inspection", label: "Inspection" },
@@ -22,16 +23,27 @@ const NAV = [
 
 /* --------------------------------------------------------------- wordmark --- */
 
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark({
+  className,
+  withMark = false,
+}: {
+  className?: string;
+  withMark?: boolean;
+}) {
   return (
-    <span
-      className={cn(
-        "select-none text-[17px] font-semibold tracking-[var(--tracking-tightest)]",
-        className,
+    <span className={cn("inline-flex select-none items-center gap-2", className)}>
+      {withMark && (
+        <span
+          aria-hidden
+          className="grid h-5 w-5 shrink-0 place-items-center border border-accent-line bg-accent-soft"
+        >
+          <span className="h-1.5 w-1.5 bg-accent" />
+        </span>
       )}
-    >
-      Metr
-      <span className="text-accent">IQ</span>
+      <span className="text-[17px] font-semibold tracking-[var(--tracking-tightest)]">
+        Metr
+        <span className="text-accent">IQ</span>
+      </span>
     </span>
   );
 }
@@ -51,7 +63,7 @@ function HealthStatus() {
 
   return (
     <div
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 border border-line-strong px-2 py-1"
       title={
         error
           ? "The MetrIQ backend is not reachable"
@@ -62,12 +74,12 @@ function HealthStatus() {
     >
       <span
         className={cn(
-          "inline-block h-2 w-2 rounded-full",
+          "inline-block h-1.5 w-1.5",
           state.color,
           loading && "animate-pulse",
         )}
       />
-      <Mono muted className="hidden text-[11px] uppercase tracking-[0.1em] sm:inline">
+      <Mono muted className="text-[10px] uppercase tracking-[0.14em]">
         {state.label}
       </Mono>
     </div>
@@ -91,7 +103,7 @@ function NavItem({
       onClick={onClick}
       className={({ isActive }) =>
         cn(
-          "relative py-1 text-[13px] transition-colors",
+          "group relative py-1 text-[13px] transition-colors",
           isActive ? "text-ink" : "text-ink-soft hover:text-ink",
         )
       }
@@ -101,8 +113,8 @@ function NavItem({
           {label}
           <span
             className={cn(
-              "absolute -bottom-[13px] left-0 hidden h-px w-full bg-accent md:block",
-              isActive ? "opacity-100" : "opacity-0",
+              "absolute -bottom-[21px] left-0 hidden h-[2px] w-full bg-accent transition-opacity md:block",
+              isActive ? "opacity-100" : "opacity-0 group-hover:opacity-30",
             )}
           />
         </>
@@ -120,13 +132,14 @@ function TopNav() {
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-[1240px] items-center justify-between gap-6 px-5 sm:px-8">
-        <div className="flex items-center gap-8">
-          <NavLink to="/" className="flex items-center gap-2.5">
-            <Wordmark />
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-accent/30" aria-hidden />
+      <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-6 px-5 sm:px-8">
+        <div className="flex items-center gap-9">
+          <NavLink to="/" className="flex items-center">
+            <Wordmark withMark />
           </NavLink>
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-7 md:flex">
             {NAV.map((item) => (
               <NavItem key={item.to} {...item} />
             ))}
@@ -135,7 +148,6 @@ function TopNav() {
 
         <div className="flex items-center gap-4">
           <HealthStatus />
-          <span className="hidden h-4 w-px bg-line sm:block" />
           <button
             type="button"
             className="hidden text-ink-faint transition-colors hover:text-ink sm:block"
@@ -210,9 +222,14 @@ export function SystemLayerFooter() {
           <rect width="100%" height="100%" fill="url(#ticks)" />
         </svg>
 
+        <DigitHalftone className="right-2 max-h-[60%] w-[70%] opacity-70 [mask-image:linear-gradient(to_left,#000,transparent)]" />
+
         <div className="relative mx-auto max-w-[1240px] px-5 py-20 sm:px-8 sm:py-28">
-          <div className="kicker !text-white/55">The MetrIQ system layer</div>
-          <p className="mt-5 max-w-xl text-2xl font-medium leading-snug tracking-tight sm:text-[2rem]">
+          <div className="flex items-center gap-3">
+            <span className="eyebrow !text-white/70">The MetrIQ system layer</span>
+            <span className="h-px w-8 bg-white/40" aria-hidden />
+          </div>
+          <p className="display mt-5 max-w-xl text-[1.9rem] leading-[1.08] sm:text-[2.4rem]">
             Image to evidence to verified inspection report — every step recorded,
             every finding traceable to a source.
           </p>
@@ -252,9 +269,12 @@ export function AppLayout() {
   return (
     <div className="flex min-h-dvh flex-col">
       <TopNav />
-      <main className="mx-auto w-full max-w-[1240px] flex-1 px-5 py-10 sm:px-8 sm:py-14">
-        <Outlet />
-      </main>
+      <div className="relative mx-auto w-full max-w-[1240px] flex-1">
+        <div className="content-rails pointer-events-none absolute inset-0 hidden lg:block" aria-hidden />
+        <main className="px-5 py-12 sm:px-8 sm:py-16">
+          <Outlet />
+        </main>
+      </div>
       <SystemLayerFooter />
       <ScrollRestoration />
     </div>

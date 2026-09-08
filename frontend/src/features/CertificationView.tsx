@@ -3,13 +3,12 @@ import { api } from "@/lib/api";
 import { useAsyncTask } from "@/lib/hooks";
 import {
   Button,
-  EmptyState,
   InlineLoading,
-  Panel,
-  SectionHeading,
+  PageHeader,
   TextArea,
   TextInput,
 } from "@/components/ui";
+import { Annotation, BlueprintField, Bracket } from "@/components/decor";
 import { GroundedAnswer } from "@/components/GroundedAnswer";
 import { ErrorNote } from "@/features/StandardsView";
 
@@ -31,17 +30,19 @@ export function CertificationView() {
   }
 
   return (
-    <div className="space-y-10">
-      <SectionHeading
-        kicker="Certification guidance"
-        title="BIS certification — grounded in evidence"
-        description="MetrIQ retrieves certification evidence from the BIS knowledge base and asks the local model to explain only that evidence. When the knowledge base does not support an answer, it abstains — it does not decide the legal requirement."
+    <div className="space-y-12">
+      <PageHeader
+        eyebrow="Certification guidance"
+        title="BIS certification, grounded in evidence"
+        lead="MetrIQ retrieves certification evidence from the BIS knowledge base and asks the local model to explain only that evidence. When the knowledge base does not support an answer it abstains — it does not decide the legal requirement."
+        annotation={<Annotation lead="right">Grounded · abstains when unsupported</Annotation>}
       />
 
-      <Panel flush>
-        <form onSubmit={submit} className="space-y-3 p-4">
+      <div className="relative border border-line bg-raised">
+        <Bracket tone="accent" />
+        <form onSubmit={submit} className="space-y-4 p-5 sm:p-6">
           <div>
-            <label className="kicker mb-1.5 block">Question</label>
+            <label className="kicker mb-2 block">Question</label>
             <TextArea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -51,7 +52,7 @@ export function CertificationView() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1">
-              <label className="kicker mb-1.5 block">
+              <label className="kicker mb-2 block">
                 Product context <span className="normal-case">(optional)</span>
               </label>
               <TextInput
@@ -60,12 +61,12 @@ export function CertificationView() {
                 placeholder="e.g. stainless steel water bottle"
               />
             </div>
-            <Button type="submit" disabled={task.loading || !question.trim()}>
+            <Button type="submit" size="lg" disabled={task.loading || !question.trim()}>
               {task.loading ? <InlineLoading label="Reasoning" /> : "Ask"}
             </Button>
           </div>
         </form>
-        <div className="flex flex-col gap-1.5 border-t border-line px-4 py-3">
+        <div className="flex flex-col gap-1.5 border-t border-line px-5 py-3 sm:px-6">
           <span className="kicker">Examples</span>
           {EXAMPLES.map((ex) => (
             <button
@@ -75,16 +76,17 @@ export function CertificationView() {
                 setQuestion(ex);
                 task.run(ex, "").catch(() => {});
               }}
-              className="text-left text-[12px] text-ink-soft hover:text-accent"
+              className="text-left text-[12px] text-ink-soft transition-colors hover:text-accent"
             >
               {ex}
             </button>
           ))}
         </div>
-      </Panel>
+      </div>
 
       {task.loading && (
-        <p className="text-[12px] text-ink-faint">
+        <p className="flex items-center gap-2 text-[12px] text-ink-faint">
+          <span className="h-1 w-1 animate-pulse bg-accent" />
           The local model is reading the retrieved BIS evidence — this can take a
           moment.
         </p>
@@ -99,10 +101,7 @@ export function CertificationView() {
           confidence={task.data.confidence}
           note={task.data.note}
           sources={task.data.sources}
-          context={{
-            label: "Product",
-            value: task.data.product_context,
-          }}
+          context={{ label: "Product", value: task.data.product_context }}
           abstentionMessage={
             task.data.answer ||
             "The available BIS knowledge base does not contain sufficient verified information to answer this certification question."
@@ -111,10 +110,17 @@ export function CertificationView() {
       )}
 
       {!task.data && task.error == null && !task.loading && (
-        <EmptyState
-          title="No question asked yet"
-          description="The answer, its confidence, and every BIS source used will appear here."
-        />
+        <div className="relative border border-dashed border-line-strong bg-surface p-10">
+          <BlueprintField fade="radial" />
+          <div className="relative max-w-md">
+            <Annotation className="mb-3 inline-flex">Awaiting question</Annotation>
+            <div className="text-[15px] font-medium">No question asked yet</div>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
+              The answer, its confidence, and every BIS source used will appear
+              here as a single evidence exhibit.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

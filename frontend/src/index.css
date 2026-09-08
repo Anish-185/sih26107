@@ -60,6 +60,18 @@
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    /*
+      Paper: a barely-there warm vertical wash + a fine tooth of noise, so
+      large empty areas read as stock rather than flat #fff. Both are almost
+      subliminal by design.
+    */
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 0%,
+        rgba(255, 255, 255, 0.6) 0%,
+        transparent 60%
+      );
+    background-attachment: fixed;
   }
 
   ::selection {
@@ -83,13 +95,44 @@
 }
 
 @layer components {
-  /* Editorial kicker used above section headings. */
+  /*
+    Mono technical furniture. `.eyebrow` sits above a page title; `.kicker`
+    is the smaller inline label; `.annotation` is the faint diagram label
+    scattered around visuals. One family, three sizes.
+  */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
   .kicker {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-ink-faint);
+  }
+
+  .annotation {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+
+  /* Oversized editorial display type — the headline voice of the new design. */
+  .display {
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: var(--tracking-tightest);
+    text-wrap: balance;
+    overflow-wrap: break-word;
   }
 
   /* Fine engineered grid used behind the system-layer footer. */
@@ -101,6 +144,107 @@
       linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
     background-size: 44px 44px;
   }
+
+  /*
+    Blueprint measurement field — a very faint cobalt grid for paper surfaces.
+    Reads as a technical evidence/measurement backdrop, not decoration. Kept
+    low-contrast on purpose; do not raise the alpha.
+  */
+  .blueprint-field {
+    background-image: linear-gradient(
+        rgba(34, 70, 239, 0.055) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(34, 70, 239, 0.055) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+
+  /* Denser dot-lattice — an alternative measurement field for tighter zones. */
+  .dot-field {
+    background-image: radial-gradient(
+      rgba(34, 70, 239, 0.14) 1px,
+      transparent 1.4px
+    );
+    background-size: 18px 18px;
+  }
+
+  /*
+    Editorial margin rails: two hairlines just outside the content column,
+    with a tick at top. Applied to the layout wrapper. Purely structural.
+  */
+  .content-rails::before,
+  .content-rails::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-line);
+    pointer-events: none;
+  }
+  .content-rails::before {
+    left: 0;
+  }
+  .content-rails::after {
+    right: 0;
+  }
+}
+
+/*
+  Decorative motion. All nonessential and slow; the prefers-reduced-motion
+  block below neutralises every bit of it.
+*/
+@keyframes metriq-rise {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes metriq-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 34px 34px;
+  }
+}
+
+@keyframes metriq-sway {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.4deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(0.4deg);
+  }
+}
+
+@keyframes metriq-fade-cycle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.metriq-rise {
+  animation: metriq-rise 9s ease-in-out infinite;
+}
+.metriq-drift {
+  animation: metriq-drift 16s linear infinite;
+}
+.metriq-sway {
+  animation: metriq-sway 11s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+.metriq-pulse {
+  animation: metriq-fade-cycle 6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -109,5 +253,12 @@
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .metriq-rise,
+  .metriq-drift,
+  .metriq-sway,
+  .metriq-pulse {
+    animation: none !important;
   }
 }

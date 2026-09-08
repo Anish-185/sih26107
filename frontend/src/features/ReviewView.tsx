@@ -9,12 +9,13 @@ import {
   DefinitionRow,
   LinkButton,
   Mono,
+  PageHeader,
   Panel,
   PanelHeader,
-  SectionHeading,
   StatusBadge,
   TextArea,
 } from "@/components/ui";
+import { Annotation } from "@/components/decor";
 import {
   MockDataBanner,
   getMockInspection,
@@ -43,13 +44,15 @@ export function ReviewView() {
 
   if (!inspection || !counts) {
     return (
-      <div className="space-y-6 py-10">
-        <SectionHeading
-          kicker="Officer review"
+      <div className="space-y-8 py-6">
+        <PageHeader
+          eyebrow="Officer review"
           title="Inspection not found"
-          description="No inspection matches this identifier."
+          lead="No inspection matches this identifier."
         />
-        <LinkButton to="/history">Back to history</LinkButton>
+        <LinkButton to="/history" variant="secondary" size="lg">
+          Back to history
+        </LinkButton>
       </div>
     );
   }
@@ -71,17 +74,20 @@ export function ReviewView() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionHeading
-          kicker={`Officer review · ${inspection.id}`}
-          title={inspection.product}
-          className="[&_h1]:text-2xl"
-        />
-        <Link to="/history" className="text-[12px] text-accent hover:underline">
-          ← All inspections
-        </Link>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow={`Officer review · ${inspection.id}`}
+        title={inspection.product}
+        annotation={<Annotation lead="right">Findings need verification</Annotation>}
+        actions={
+          <Link
+            to="/history"
+            className="inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.14em] text-accent hover:text-accent-hover"
+          >
+            All inspections
+          </Link>
+        }
+      />
 
       <MockDataBanner scope="This review acts on placeholder findings; decisions are not persisted." />
 

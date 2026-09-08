@@ -4,12 +4,16 @@ import { useAsyncTask } from "@/lib/hooks";
 import {
   Button,
   Callout,
-  EmptyState,
   InlineLoading,
-  Panel,
-  SectionHeading,
+  PageHeader,
   TextArea,
 } from "@/components/ui";
+import {
+  Annotation,
+  BlueprintField,
+  Bracket,
+  PhotoFragment,
+} from "@/components/decor";
 import { GroundedAnswer } from "@/components/GroundedAnswer";
 import { ErrorNote } from "@/features/StandardsView";
 
@@ -40,12 +44,28 @@ export function HallmarkingView() {
     : "none";
 
   return (
-    <div className="space-y-10">
-      <SectionHeading
-        kicker="Hallmarking / HUID"
-        title="Hallmarking & HUID information"
-        description="Grounded answers about BIS hallmarking and the six-digit HUID, drawn from official BIS sources. This is an information feature — it does not verify a specific article's HUID."
-      />
+    <div className="space-y-12">
+      <div className="relative">
+        {/* Lion Capital detail — an Indian-institutional fragment bleeding off
+            the right edge, in the header's whitespace. */}
+        <div className="pointer-events-none absolute -right-5 top-0 hidden h-[112%] w-[30%] overflow-hidden sm:-right-8 md:block">
+          <BlueprintField fade="bottom" />
+          <PhotoFragment
+            src="/lion-capital-detail.png"
+            blend="multiply"
+            className="absolute -right-6 top-4 h-[88%] w-auto max-w-none object-cover object-left opacity-70"
+          />
+          <Bracket tone="line" className="inset-4" />
+          <Annotation className="absolute bottom-2 left-2">
+            Hallmark · Gold · HUID
+          </Annotation>
+        </div>
+        <PageHeader
+          eyebrow="Hallmarking / HUID"
+          title="Hallmarking & HUID information"
+          lead="Grounded answers about BIS hallmarking and the six-digit HUID, drawn from official BIS sources. This is an information feature — it does not verify a specific article's HUID."
+        />
+      </div>
 
       <Callout>
         MetrIQ does not run live HUID verification. To check a real article, use
@@ -53,9 +73,10 @@ export function HallmarkingView() {
         below.
       </Callout>
 
-      <Panel flush>
-        <form onSubmit={submit} className="space-y-3 p-4">
-          <label className="kicker mb-1.5 block">Question</label>
+      <div className="relative border border-line bg-raised">
+        <Bracket tone="accent" />
+        <form onSubmit={submit} className="space-y-4 p-5 sm:p-6">
+          <label className="kicker mb-2 block">Question</label>
           <TextArea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
@@ -63,12 +84,12 @@ export function HallmarkingView() {
             rows={3}
           />
           <div className="flex justify-end">
-            <Button type="submit" disabled={task.loading || !question.trim()}>
+            <Button type="submit" size="lg" disabled={task.loading || !question.trim()}>
               {task.loading ? <InlineLoading label="Reasoning" /> : "Ask"}
             </Button>
           </div>
         </form>
-        <div className="flex flex-col gap-1.5 border-t border-line px-4 py-3">
+        <div className="flex flex-col gap-1.5 border-t border-line px-5 py-3 sm:px-6">
           <span className="kicker">Examples</span>
           {EXAMPLES.map((ex) => (
             <button
@@ -78,16 +99,17 @@ export function HallmarkingView() {
                 setQuestion(ex);
                 task.run(ex).catch(() => {});
               }}
-              className="text-left text-[12px] text-ink-soft hover:text-accent"
+              className="text-left text-[12px] text-ink-soft transition-colors hover:text-accent"
             >
               {ex}
             </button>
           ))}
         </div>
-      </Panel>
+      </div>
 
       {task.loading && (
-        <p className="text-[12px] text-ink-faint">
+        <p className="flex items-center gap-2 text-[12px] text-ink-faint">
+          <span className="h-1 w-1 animate-pulse bg-accent" />
           The local model is reading the retrieved BIS evidence — this can take a
           moment.
         </p>
@@ -108,10 +130,18 @@ export function HallmarkingView() {
       )}
 
       {!res && task.error == null && !task.loading && (
-        <EmptyState
-          title="No question asked yet"
-          description="The answer and every BIS source used will appear here. Sources come from the BIS Hallmarking FAQ, the mandatory-hallmarking order, and BIS consumer pages."
-        />
+        <div className="relative border border-dashed border-line-strong bg-surface p-10">
+          <BlueprintField fade="radial" />
+          <div className="relative max-w-md">
+            <Annotation className="mb-3 inline-flex">Awaiting question</Annotation>
+            <div className="text-[15px] font-medium">No question asked yet</div>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
+              The answer and every BIS source used will appear here. Sources come
+              from the BIS Hallmarking FAQ, the mandatory-hallmarking order, and
+              BIS consumer pages.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
