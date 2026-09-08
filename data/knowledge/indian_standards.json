@@ -440,5 +440,32 @@
     "document_name": "BIS: Hallmarking FAQ",
     "verification_status": "verified",
     "last_verified": "2026-09-07"
+  },
+  {
+    "id": "is-17526-2021-domestic-stainless-steel-vacuum-flask-bottle",
+    "title": "IS 17526:2021 — Domestic Stainless Steel Vacuum Flask / Bottle",
+    "category": "indian_standards",
+    "content": "Indian Standard applicable to domestic stainless steel vacuum (insulated) flasks and bottles used to carry hot or cold beverages and drinking water. BIS operates product certification (ISI Mark, Scheme I) for this product under IS 17526:2021; the BIS Product Manual PM/17526/3 covers licensing under the BIS (Conformity Assessment) Regulations, 2018, and BIS lists insulated flasks, bottles and containers for domestic use as being under compulsory certification (mandatory ISI Mark). The BIS Product Manual notes the inner container must be stainless steel grade 304 or higher. The full standard title and technical scope were not verified from the BIS standards catalogue.",
+    "keywords": ["stainless steel", "steel", "water bottle", "bottle", "vacuum flask", "flask", "thermos", "insulated flask", "drinkware", "compulsory certification"],
+    "standard_number": "IS 17526:2021",
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://www.bis.gov.in/wp-content/uploads/2024/12/PM-IS-17526-1.pdf",
+    "document_name": "BIS Product Manual PM/17526/3 (December 2024) — Domestic Stainless Steel Vacuum Flask / Bottle",
+    "reference": "Product Manual for IS 17526:2021 (Scheme I certification)",
+    "verification_status": "verified",
+    "last_verified": "2026-09-08"
+  },
+  {
+    "id": "is-17803-2022-potable-water-bottles",
+    "title": "IS 17803:2022 — Potable Water Bottles (Copper, Stainless Steel, Aluminium)",
+    "category": "indian_standards",
+    "content": "Indian Standard applicable to non-insulated potable water bottles made of copper, stainless steel or aluminium and designed for carrying drinking water. According to BIS, the standard excludes insulated flasks and vacuum flasks (those are covered by IS 17526). BIS states that compulsory certification has been mandated for several products related to portable and drinking-water containers, and a manufacturer needs a BIS licence to use the Standard Mark. The full standard title and technical scope were not verified from the BIS standards catalogue.",
+    "keywords": ["water bottle", "bottle", "stainless steel", "steel", "copper", "aluminium", "potable water", "drinking water", "drinkware", "compulsory certification"],
+    "standard_number": "IS 17803:2022",
+    "source_organization": "Bureau of Indian Standards (BIS)",
+    "source_url": "https://services.bis.gov.in/php/BIS_2.0/gpportal2/news/detail/Mjc=",
+    "document_name": "BIS: Ensure Safe Drinking Water — Verify Potable Water Bottles (BIS advisory)",
+    "verification_status": "verified",
+    "last_verified": "2026-09-08"
   }
 ]
