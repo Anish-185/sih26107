@@ -151,20 +151,20 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-*Current status: Phase 6 complete — BIS certification guidance
-(`app/certification.py`) exposed as `POST /certification-guidance`. It reuses
-the Phase 5 `ProductStandardFinder` to identify the product/standard context,
-the Phase 3 `SearchEngine` to retrieve certification evidence (categories
-`certification` / `faqs` / `testing`), applies a deterministic sufficiency
-check, and only then asks the local LLM to explain that evidence. When the
-knowledge base lacks enough certification evidence it abstains with a fixed
-message and never calls the LLM. The LLM explains evidence; it does not decide
-the legal requirement, and the "a Standard exists" vs "certification is
-mandatory" distinction is kept explicit.
-Phase 5 recap: Product -> Standard discovery (`app/product.py`,
-`POST /product-standard`) filters `SearchEngine` hits to standards that
-actually describe the product; KB gained IS 17526:2021 and IS 17803:2022.
-Next: Phase 7 (BIS-recognized laboratory search).
+*Current status: Phase 7 complete — BIS-recognized laboratory search
+(`app/laboratory.py`) exposed as `POST /laboratory-search`. It runs the Phase 3
+`SearchEngine` over the `laboratories` / `testing` categories, identifies an
+Indian Standard the query names, checks evidence sufficiency, and optionally
+(`explain`, default true) asks the local LLM to explain that evidence. The
+curated KB holds NO individual laboratory records (no names, addresses,
+recognition status, NABL numbers, or IS-wise scope), so the service never names
+a laboratory: it points to BIS's official recognised/empanelled-lab lists and
+the LIMS portal (lims.bis.gov.in), and abstains with a fixed message (no LLM
+call) when no lab/testing evidence is retrieved.
+Phase 6 recap: certification guidance (`app/certification.py`,
+`POST /certification-guidance`). Phase 5 recap: Product -> Standard discovery
+(`app/product.py`, `POST /product-standard`).
+Next: Phase 8 (Hallmarking / HUID information).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -182,6 +182,7 @@ sih26107/
       rag.py           # grounded BIS question-answering pipeline (/ask)
       product.py       # Phase 5: Product -> Standard discovery
       certification.py # Phase 6: BIS certification guidance
+      laboratory.py    # Phase 7: BIS-recognized laboratory search
       knowledge/       # knowledge-base schema + loader
         schema.py      # KnowledgeItem pydantic model + validation rules
         loader.py      # load + validate data/knowledge/, report every problem
@@ -195,6 +196,7 @@ sih26107/
       test_retrieval.py    # plain-Python checks for search + /search API
       test_product.py      # plain-Python checks for Product -> Standard
       test_certification.py # plain-Python checks for certification guidance
+      test_laboratory.py   # plain-Python checks for laboratory search
     requirements.txt
     .env.example
   data/

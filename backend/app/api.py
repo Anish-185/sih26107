@@ -6,6 +6,7 @@ Endpoints:
   - POST /ask
   - POST /product-standard
   - POST /certification-guidance
+  - POST /laboratory-search
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.certification import CertificationGuidanceService
+from app.laboratory import LaboratorySearchService
 from app.llm import LLMError, LocalLLM
 from app.product import ProductStandardFinder
 from app.rag import BISQuestionAnswerer
@@ -54,6 +56,14 @@ def get_certification_service() -> CertificationGuidanceService:
     return CertificationGuidanceService(
         search_engine=get_engine(),
         product_finder=get_product_finder(),
+        llm=LocalLLM(),
+    )
+
+
+@lru_cache(maxsize=1)
+def get_laboratory_service() -> LaboratorySearchService:
+    return LaboratorySearchService(
+        search_engine=get_engine(),
         llm=LocalLLM(),
     )
 
@@ -204,6 +214,36 @@ class CertificationGuidanceRequest(BaseModel):
 class CertificationGuidanceResponse(BaseModel):
     question: str
     product_context: str | None = None
+    answer: str
+    grounded: bool
+    confidence: str
+    source_count: int
+    sources: list[SourceOut]
+    note: str = ""
+
+
+# ---------------------------------------------------------------------
+# Laboratory-search models
+# ---------------------------------------------------------------------
+
+class LaboratorySearchRequest(BaseModel):
+    query: str = Field(
+        default="",
+        description="Laboratory-related question (e.g. 'BIS recognised lab for steel')",
+    )
+    standard: str = Field(
+        default="",
+        description="Optional Indian Standard or product to give the query context",
+    )
+    explain: bool = Field(
+        default=True,
+        description="If false, skip the LLM and return a deterministic summary",
+    )
+
+
+class LaboratorySearchResponse(BaseModel):
+    query: str
+    standard_context: str | None = None
     answer: str
     grounded: bool
     confidence: str
@@ -485,6 +525,54 @@ def certification_guidance_post(
     return CertificationGuidanceResponse(
         question=question,
         product_context=result.product_context,
+        answer=result.answer,
+        grounded=result.grounded,
+        confidence=result.confidence,
+        source_count=len(result.sources),
+        sources=[_result_to_source(item) for item in result.sources],
+        note=result.note,
+    )
+
+
+# ---------------------------------------------------------------------
+# Laboratory-search route
+# ---------------------------------------------------------------------
+
+@router.post(
+    "/laboratory-search",
+    response_model=LaboratorySearchResponse,
+)
+def laboratory_search_post(
+    request: LaboratorySearchRequest,
+) -> LaboratorySearchResponse:
+    query = request.query.strip()
+    standard = request.standard.strip()
+
+    if not query:
+        return LaboratorySearchResponse(
+            query="",
+            standard_context=None,
+            answer="Please provide a laboratory-related question.",
+            grounded=False,
+            confidence="none",
+            source_count=0,
+            sources=[],
+            note="empty query",
+        )
+
+    combined = f"{query} {standard}".strip()
+
+    try:
+        result = get_laboratory_service().search(combined, explain=request.explain)
+    except LLMError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Local LLM unavailable: {exc}",
+        ) from exc
+
+    return LaboratorySearchResponse(
+        query=query,
+        standard_context=result.standard_context,
         answer=result.answer,
         grounded=result.grounded,
         confidence=result.confidence,
