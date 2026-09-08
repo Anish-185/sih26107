@@ -52,3 +52,15 @@ export function titleCase(s: string): string {
 export function categoryLabel(category: string): string {
   return titleCase(category.replace(/_/g, " "));
 }
+
+/**
+ * Drop a leading standard-number prefix from a record title so it does not
+ * repeat the standard number shown next to it. KB titles are formatted
+ * "<standard number> — <description>", e.g.
+ * "IS 16102 (Part 1) — Self-ballasted LED lamps" -> "Self-ballasted LED lamps".
+ * Falls back to the original title when it is not in that form.
+ */
+export function standardTitle(title: string): string {
+  const match = /^IS[\s/][\w/().:\s-]*?\s[—–]\s(.+)$/.exec(title.trim());
+  return match ? match[1].trim() : title;
+}

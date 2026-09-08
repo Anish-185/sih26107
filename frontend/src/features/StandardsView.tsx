@@ -2,6 +2,7 @@ import { type FormEvent, useState } from "react";
 import { Search } from "lucide-react";
 import { ApiError, api, type ProductStandardResult } from "@/lib/api";
 import { useAsyncTask } from "@/lib/hooks";
+import { standardTitle } from "@/lib/format";
 import {
   Button,
   Callout,
@@ -76,6 +77,11 @@ export function StandardsView() {
         </div>
       </Panel>
 
+      {task.loading && (
+        <p className="text-[12px] text-ink-faint">
+          Running deterministic retrieval over the BIS knowledge base…
+        </p>
+      )}
       {task.error != null && <ErrorNote error={task.error} />}
 
       {res && (
@@ -140,7 +146,9 @@ function StandardResult({
               {result.standard_number}
             </Mono>
           </div>
-          <h3 className="mt-1 text-[15px] font-medium text-ink">{result.title}</h3>
+          <h3 className="mt-1 text-[15px] font-medium text-ink">
+            {standardTitle(result.title)}
+          </h3>
           <p className="mt-1 text-[12px] text-ink-faint">
             {result.source_organization}
             {result.document_name ? ` · ${result.document_name}` : ""}
@@ -168,29 +176,34 @@ function StandardResult({
 
       <div className="mt-4 border-t border-line pt-3">
         <div className="kicker mb-2">Why this result</div>
-        <p className="text-[13px] leading-relaxed text-ink">
-          {result.why.summary}
-        </p>
+        {result.why?.summary && (
+          <p className="text-[13px] leading-relaxed text-ink">
+            {result.why.summary}
+          </p>
+        )}
         {topReasons.length > 0 && (
-          <ul className="mt-3 space-y-1.5">
-            {topReasons.map((reason, i) => (
-              <li
-                key={`${reason.field}-${reason.term}-${i}`}
-                className="flex items-baseline gap-2 text-[12px] text-ink-soft"
-              >
-                <Mono muted className="w-24 shrink-0 text-[11px] uppercase">
-                  {reason.field}
-                </Mono>
-                <span>
-                  term <Mono>{reason.term}</Mono>
-                  {reason.detail ? ` — ${reason.detail}` : ""}
-                </span>
-                <Mono muted className="ml-auto text-[11px]">
-                  +{reason.weight}
-                </Mono>
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className="kicker mb-2 mt-3">Retrieval signals</div>
+            <ul className="space-y-1.5">
+              {topReasons.map((reason, i) => (
+                <li
+                  key={`${reason.field}-${reason.term}-${i}`}
+                  className="flex items-baseline gap-2 text-[12px] text-ink-soft"
+                >
+                  <Mono muted className="w-24 shrink-0 text-[11px] uppercase">
+                    {reason.field}
+                  </Mono>
+                  <span>
+                    term <Mono>{reason.term}</Mono>
+                    {reason.detail ? ` — ${reason.detail}` : ""}
+                  </span>
+                  <Mono muted className="ml-auto text-[11px]">
+                    +{reason.weight}
+                  </Mono>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </div>
 
@@ -209,11 +222,16 @@ function StandardResult({
 }
 
 export function ErrorNote({ error }: { error: unknown }) {
+  const apiError = error instanceof ApiError ? error : null;
+  // A timeout or an unreachable local model is an environment condition, not a
+  // failed request the user should worry about — label it accordingly.
+  const modelSlow = apiError?.status === 408 || apiError?.isModelUnavailable;
   const msg =
-    error instanceof ApiError
-      ? error.detail
-      : error instanceof Error
-        ? error.message
-        : "Something went wrong.";
-  return <Callout title="Request failed">{msg}</Callout>;
+    apiError?.detail ??
+    (error instanceof Error ? error.message : "Something went wrong.");
+  return (
+    <Callout title={modelSlow ? "The local model didn’t respond" : "Request failed"}>
+      {msg}
+    </Callout>
+  );
 }

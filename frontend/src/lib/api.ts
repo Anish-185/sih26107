@@ -7,9 +7,10 @@
 
   Contracts mirror backend/app/api.py:
     GET  /health
-    POST /product-standard
+    POST /product-standard   (+ deterministic "why this result" per candidate)
     POST /certification-guidance
     POST /laboratory-search
+    POST /ask                (grounded BIS Q&A — used by the Hallmarking view)
 */
 
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "/api").replace(/\/$/, "");
@@ -49,7 +50,7 @@ async function request<T>(
     if (err instanceof DOMException && err.name === "AbortError") {
       throw new ApiError(
         408,
-        "The request timed out. The local model may be slow or offline — try the deterministic option.",
+        "The request timed out — the local language model is taking too long to respond. Please try again in a moment.",
       );
     }
     throw new ApiError(0, "Cannot reach the MetrIQ backend. Is the API running?");

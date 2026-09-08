@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Check, RotateCcw } from "lucide-react";
 import { api, type ProductStandardResponse } from "@/lib/api";
 import { useAsyncTask } from "@/lib/hooks";
+import { standardTitle } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import {
   Button,
@@ -446,9 +447,7 @@ function RequirementsPanel({
             {standard.results.slice(0, 2).map((r) => (
               <div key={r.id} className="text-[12px]">
                 <Mono>{r.standard_number}</Mono>{" "}
-                <span className="text-ink-soft">
-                  — {r.title.replace(/^IS\s[\d/().:A-Za-z\s-]+—\s*/, "")}
-                </span>
+                <span className="text-ink-soft">— {standardTitle(r.title)}</span>
                 {r.source_url && (
                   <a
                     href={r.source_url}
