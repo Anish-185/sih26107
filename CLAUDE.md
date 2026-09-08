@@ -151,11 +151,20 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-*Current status: Phase 4 complete — grounded local LLM question answering
-(`app/rag.py` + `app/llm.py`) exposed as `POST /ask`, using deterministic
-retrieval as the source of truth and Qwen3-8B locally through LM Studio.
-Unsupported questions abstain instead of being answered from model knowledge.
-Next: Phase 5 (Product -> Standard).
+*Current status: Phase 6 complete — BIS certification guidance
+(`app/certification.py`) exposed as `POST /certification-guidance`. It reuses
+the Phase 5 `ProductStandardFinder` to identify the product/standard context,
+the Phase 3 `SearchEngine` to retrieve certification evidence (categories
+`certification` / `faqs` / `testing`), applies a deterministic sufficiency
+check, and only then asks the local LLM to explain that evidence. When the
+knowledge base lacks enough certification evidence it abstains with a fixed
+message and never calls the LLM. The LLM explains evidence; it does not decide
+the legal requirement, and the "a Standard exists" vs "certification is
+mandatory" distinction is kept explicit.
+Phase 5 recap: Product -> Standard discovery (`app/product.py`,
+`POST /product-standard`) filters `SearchEngine` hits to standards that
+actually describe the product; KB gained IS 17526:2021 and IS 17803:2022.
+Next: Phase 7 (BIS-recognized laboratory search).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -167,10 +176,12 @@ sih26107/
   README.md            # setup & run instructions
   backend/             # Python + FastAPI service
     app/
-      main.py          # FastAPI app: /health, /search, /ask
-      api.py           # GET/POST /search + POST /ask
+      main.py          # FastAPI app: /health + the api.py router
+      api.py           # /search, /ask, /product-standard, /certification-guidance
       llm.py           # LM Studio / Qwen3-8B local LLM adapter
-      rag.py           # grounded BIS question-answering pipeline
+      rag.py           # grounded BIS question-answering pipeline (/ask)
+      product.py       # Phase 5: Product -> Standard discovery
+      certification.py # Phase 6: BIS certification guidance
       knowledge/       # knowledge-base schema + loader
         schema.py      # KnowledgeItem pydantic model + validation rules
         loader.py      # load + validate data/knowledge/, report every problem
@@ -182,6 +193,8 @@ sih26107/
     tests/
       test_knowledge.py    # plain-Python checks (no test framework)
       test_retrieval.py    # plain-Python checks for search + /search API
+      test_product.py      # plain-Python checks for Product -> Standard
+      test_certification.py # plain-Python checks for certification guidance
     requirements.txt
     .env.example
   data/

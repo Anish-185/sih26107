@@ -1,12 +1,11 @@
-"""HTTP layer for retrieval and grounded question answering.
+"""HTTP layer for retrieval, grounded question answering, and product discovery.
 
 Endpoints:
-  - GET/POST /search
+  - GET /search
+  - POST /search
   - POST /ask
-
-/search remains deterministic lexical retrieval.
-/ask retrieves BIS evidence first, then uses the local Qwen3 model
-to generate an answer grounded in that evidence.
+  - POST /product-standard
+  - POST /certification-guidance
 """
 
 from __future__ import annotations
@@ -17,30 +16,51 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from app.certification import CertificationGuidanceService
 from app.llm import LLMError, LocalLLM
+from app.product import ProductStandardFinder
 from app.rag import BISQuestionAnswerer
 from app.retrieval import RetrievalResult, SearchEngine, SearchOutcome
 
 router = APIRouter(tags=["search"])
 
 
+# ---------------------------------------------------------------------
+# Services
+# ---------------------------------------------------------------------
+
 @lru_cache(maxsize=1)
 def get_engine() -> SearchEngine:
-    """One SearchEngine for the whole process (loads the knowledge base once)."""
     return SearchEngine()
 
 
 @lru_cache(maxsize=1)
 def get_answerer() -> BISQuestionAnswerer:
-    """One grounded QA pipeline for the whole process."""
     return BISQuestionAnswerer(
         search_engine=get_engine(),
         llm=LocalLLM(),
     )
 
 
-# --------------------------------------------------------------------- responses
+@lru_cache(maxsize=1)
+def get_product_finder() -> ProductStandardFinder:
+    return ProductStandardFinder(
+        search_engine=get_engine(),
+    )
 
+
+@lru_cache(maxsize=1)
+def get_certification_service() -> CertificationGuidanceService:
+    return CertificationGuidanceService(
+        search_engine=get_engine(),
+        product_finder=get_product_finder(),
+        llm=LocalLLM(),
+    )
+
+
+# ---------------------------------------------------------------------
+# Common models
+# ---------------------------------------------------------------------
 
 class ReasonOut(BaseModel):
     field: str
@@ -80,12 +100,20 @@ class SearchResponse(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    query: str = Field(default="", description="Natural-language question")
-    limit: int | None = Field(default=None, ge=1, le=50)
+    query: str = Field(
+        default="",
+        description="Natural-language question",
+    )
+    limit: int | None = Field(
+        default=None,
+        ge=1,
+        le=50,
+    )
 
 
-# --------------------------------------------------------------------- ask models
-
+# ---------------------------------------------------------------------
+# Ask models
+# ---------------------------------------------------------------------
 
 class SourceOut(BaseModel):
     id: str
@@ -118,11 +146,79 @@ class AskResponse(BaseModel):
     sources: list[SourceOut]
 
 
-# --------------------------------------------------------------------- helpers
+# ---------------------------------------------------------------------
+# Product -> Standard models
+# ---------------------------------------------------------------------
 
+class ProductStandardRequest(BaseModel):
+    product: str = Field(
+        default="",
+        description="Natural-language product description",
+    )
+    limit: int = Field(
+        default=5,
+        ge=1,
+        le=50,
+    )
+
+
+class ProductStandardResultOut(BaseModel):
+    id: str
+    title: str
+    standard_number: str
+    score: float
+    confidence: str
+    matched_terms: list[str]
+    reasons: list[ReasonOut]
+    source_organization: str
+    source_url: str | None = None
+    document_name: str | None = None
+    reference: str | None = None
+    verification_status: str
+    last_verified: str | None = None
+
+
+class ProductStandardResponse(BaseModel):
+    product: str
+    results: list[ProductStandardResultOut]
+    grounded: bool
+    confidence: str
+    note: str = ""
+
+
+# ---------------------------------------------------------------------
+# Certification-guidance models
+# ---------------------------------------------------------------------
+
+class CertificationGuidanceRequest(BaseModel):
+    question: str = Field(
+        default="",
+        description="Question about BIS certification",
+    )
+    product: str = Field(
+        default="",
+        description="Optional product description to give the question context",
+    )
+
+
+class CertificationGuidanceResponse(BaseModel):
+    question: str
+    product_context: str | None = None
+    answer: str
+    grounded: bool
+    confidence: str
+    source_count: int
+    sources: list[SourceOut]
+    note: str = ""
+
+
+# ---------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------
 
 def _result_to_out(result: RetrievalResult) -> ResultOut:
     item = result.item
+
     return ResultOut(
         id=item.id,
         title=item.title,
@@ -133,12 +229,12 @@ def _result_to_out(result: RetrievalResult) -> ResultOut:
         matched_terms=result.matched_terms,
         reasons=[
             ReasonOut(
-                field=r.field,
-                term=r.term,
-                weight=r.weight,
-                detail=r.detail,
+                field=reason.field,
+                term=reason.term,
+                weight=reason.weight,
+                detail=reason.detail,
             )
-            for r in result.reasons
+            for reason in result.reasons
         ],
         standard_number=item.standard_number,
         source_organization=item.source_organization,
@@ -154,7 +250,9 @@ def _result_to_out(result: RetrievalResult) -> ResultOut:
     )
 
 
-def _outcome_to_response(outcome: SearchOutcome) -> SearchResponse:
+def _outcome_to_response(
+    outcome: SearchOutcome,
+) -> SearchResponse:
     return SearchResponse(
         query=outcome.query,
         normalized_query=outcome.normalized_query,
@@ -164,11 +262,16 @@ def _outcome_to_response(outcome: SearchOutcome) -> SearchResponse:
         abstained=outcome.abstained,
         note=outcome.note,
         count=len(outcome.results),
-        results=[_result_to_out(r) for r in outcome.results],
+        results=[
+            _result_to_out(result)
+            for result in outcome.results
+        ],
     )
 
 
-def _result_to_source(result: RetrievalResult) -> SourceOut:
+def _result_to_source(
+    result: RetrievalResult,
+) -> SourceOut:
     item = result.item
 
     return SourceOut(
@@ -192,34 +295,63 @@ def _result_to_source(result: RetrievalResult) -> SourceOut:
     )
 
 
-# --------------------------------------------------------------------- routes
+# ---------------------------------------------------------------------
+# Search routes
+# ---------------------------------------------------------------------
 
-
-@router.get("/search", response_model=SearchResponse)
+@router.get(
+    "/search",
+    response_model=SearchResponse,
+)
 def search_get(
-    q: Annotated[str, Query(description="Natural-language question")] = "",
-    limit: Annotated[int | None, Query(ge=1, le=50)] = None,
+    q: Annotated[
+        str,
+        Query(description="Natural-language question"),
+    ] = "",
+    limit: Annotated[
+        int | None,
+        Query(ge=1, le=50),
+    ] = None,
 ) -> SearchResponse:
-    return _outcome_to_response(get_engine().search(q, limit))
-
-
-@router.post("/search", response_model=SearchResponse)
-def search_post(request: SearchRequest) -> SearchResponse:
     return _outcome_to_response(
-        get_engine().search(request.query, request.limit)
+        get_engine().search(q, limit)
     )
 
 
-@router.post("/ask", response_model=AskResponse)
-def ask_post(request: AskRequest) -> AskResponse:
+@router.post(
+    "/search",
+    response_model=SearchResponse,
+)
+def search_post(
+    request: SearchRequest,
+) -> SearchResponse:
+    return _outcome_to_response(
+        get_engine().search(
+            request.query,
+            request.limit,
+        )
+    )
+
+
+# ---------------------------------------------------------------------
+# Grounded Ask route
+# ---------------------------------------------------------------------
+
+@router.post(
+    "/ask",
+    response_model=AskResponse,
+)
+def ask_post(
+    request: AskRequest,
+) -> AskResponse:
     question = request.question.strip()
 
     if not question:
         return AskResponse(
             question="",
             answer=(
-                "Please provide a question about BIS standards or "
-                "BIS information."
+                "Please provide a question about BIS standards "
+                "or BIS information."
             ),
             grounded=False,
             source_count=0,
@@ -243,4 +375,120 @@ def ask_post(request: AskRequest) -> AskResponse:
             _result_to_source(result_item)
             for result_item in result.results
         ],
+    )
+
+
+# ---------------------------------------------------------------------
+# Product -> Standard route
+# ---------------------------------------------------------------------
+
+@router.post(
+    "/product-standard",
+    response_model=ProductStandardResponse,
+)
+def product_standard_post(
+    request: ProductStandardRequest,
+) -> ProductStandardResponse:
+    product = request.product.strip()
+
+    if not product:
+        return ProductStandardResponse(
+            product="",
+            results=[],
+            grounded=False,
+            confidence="none",
+            note="Please provide a product description.",
+        )
+
+    outcome = get_product_finder().find(
+        product,
+        limit=request.limit,
+    )
+
+    results = [
+        ProductStandardResultOut(
+            id=result.item.id,
+            title=result.item.title,
+            standard_number=result.item.standard_number,
+            score=result.score,
+            confidence=result.confidence,
+            matched_terms=result.matched_terms,
+            reasons=[
+                ReasonOut(
+                    field=reason.field,
+                    term=reason.term,
+                    weight=reason.weight,
+                    detail=reason.detail,
+                )
+                for reason in result.reasons
+            ],
+            source_organization=result.item.source_organization,
+            source_url=result.item.source_url,
+            document_name=result.item.document_name,
+            reference=result.item.reference,
+            verification_status=result.item.verification_status,
+            last_verified=(
+                result.item.last_verified.isoformat()
+                if result.item.last_verified
+                else None
+            ),
+        )
+        for result in outcome.results
+    ]
+
+    return ProductStandardResponse(
+        product=outcome.product,
+        results=results,
+        grounded=outcome.grounded,
+        confidence=outcome.confidence,
+        note=outcome.note,
+    )
+
+
+# ---------------------------------------------------------------------
+# Certification-guidance route
+# ---------------------------------------------------------------------
+
+@router.post(
+    "/certification-guidance",
+    response_model=CertificationGuidanceResponse,
+)
+def certification_guidance_post(
+    request: CertificationGuidanceRequest,
+) -> CertificationGuidanceResponse:
+    question = request.question.strip()
+    product = request.product.strip()
+
+    if not question:
+        return CertificationGuidanceResponse(
+            question="",
+            product_context=None,
+            answer="Please provide a question about BIS certification.",
+            grounded=False,
+            confidence="none",
+            source_count=0,
+            sources=[],
+            note="empty question",
+        )
+
+    # The optional product description is appended so retrieval has more context.
+    combined = f"{question} {product}".strip()
+
+    try:
+        result = get_certification_service().guide(combined)
+    except LLMError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Local LLM unavailable: {exc}",
+        ) from exc
+
+    return CertificationGuidanceResponse(
+        question=question,
+        product_context=result.product_context,
+        answer=result.answer,
+        grounded=result.grounded,
+        confidence=result.confidence,
+        source_count=len(result.sources),
+        sources=[_result_to_source(item) for item in result.sources],
+        note=result.note,
     )
