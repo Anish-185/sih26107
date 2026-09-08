@@ -166,10 +166,13 @@ function StandardResult({
         </div>
       )}
 
-      {topReasons.length > 0 && (
-        <div className="mt-4 border-t border-line pt-3">
-          <div className="kicker mb-2">Why this matched</div>
-          <ul className="space-y-1.5">
+      <div className="mt-4 border-t border-line pt-3">
+        <div className="kicker mb-2">Why this result</div>
+        <p className="text-[13px] leading-relaxed text-ink">
+          {result.why.summary}
+        </p>
+        {topReasons.length > 0 && (
+          <ul className="mt-3 space-y-1.5">
             {topReasons.map((reason, i) => (
               <li
                 key={`${reason.field}-${reason.term}-${i}`}
@@ -188,8 +191,8 @@ function StandardResult({
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        )}
+      </div>
 
       {result.source_url && (
         <a

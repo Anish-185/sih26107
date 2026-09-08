@@ -112,6 +112,13 @@ export interface Health {
   version: string;
 }
 
+export interface WhyThisResult {
+  standard_number: string;
+  strength: string;
+  signals: string[];
+  summary: string;
+}
+
 export interface ProductStandardResult {
   id: string;
   title: string;
@@ -120,6 +127,7 @@ export interface ProductStandardResult {
   confidence: string;
   matched_terms: string[];
   reasons: Reason[];
+  why: WhyThisResult;
   source_organization: string;
   source_url: string | null;
   document_name: string | null;

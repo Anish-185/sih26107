@@ -172,6 +172,18 @@ class ProductStandardRequest(BaseModel):
     )
 
 
+class WhyOut(BaseModel):
+    """Deterministic 'Why this result?' explanation (Phase 9).
+
+    Derived from the retrieval engine's MatchReason data - no LLM involved.
+    """
+
+    standard_number: str
+    strength: str
+    signals: list[str]
+    summary: str
+
+
 class ProductStandardResultOut(BaseModel):
     id: str
     title: str
@@ -180,6 +192,7 @@ class ProductStandardResultOut(BaseModel):
     confidence: str
     matched_terms: list[str]
     reasons: list[ReasonOut]
+    why: WhyOut
     source_organization: str
     source_url: str | None = None
     document_name: str | None = None
@@ -462,6 +475,12 @@ def product_standard_post(
                 )
                 for reason in result.reasons
             ],
+            why=WhyOut(
+                standard_number=why.standard_number,
+                strength=why.strength,
+                signals=why.signals,
+                summary=why.summary,
+            ),
             source_organization=result.item.source_organization,
             source_url=result.item.source_url,
             document_name=result.item.document_name,
@@ -473,7 +492,7 @@ def product_standard_post(
                 else None
             ),
         )
-        for result in outcome.results
+        for result, why in zip(outcome.results, outcome.explanations)
     ]
 
     return ProductStandardResponse(

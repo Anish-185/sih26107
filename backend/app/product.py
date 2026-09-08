@@ -3,9 +3,112 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.retrieval.engine import RetrievalResult, SearchEngine
+
+# ---------------------------------------------------------------------------
+# "Why this result?" (Phase 9)
+#
+# The deterministic retrieval engine (Phase 3) already decides *which* fields a
+# query matched, with what term, and with what weight - every one recorded as a
+# MatchReason on the RetrievalResult. Phase 9 only turns those existing facts
+# into a short, human-readable sentence. There is NO LLM here and NO second
+# ranking or scoring pass: `explain_candidate` is a pure function of the
+# RetrievalResult the engine already produced.
+# ---------------------------------------------------------------------------
+
+# Fixed display order + phrasing for each MatchReason field. Order matters so
+# the explanation is deterministic regardless of the order reasons were added.
+_FIELD_PHRASES: dict[str, str] = {
+    "standard_number": "the query names this Indian Standard number",
+    "category": "the query wording points to this standard's subject area",
+    "title": "query terms appear in the standard's title",
+    "keywords": "query terms match keywords recorded for this standard",
+    "document_name": "query terms appear in the name of the BIS source document",
+    "reference": "query terms appear in the standard's BIS reference",
+    "content": "query terms appear in the BIS description of this standard",
+}
+_FIELD_ORDER: list[str] = list(_FIELD_PHRASES)
+
+# Retrieval confidence -> plain word used in the explanation.
+_STRENGTH: dict[str, str] = {
+    "high": "strong",
+    "medium": "moderate",
+    "low": "weak",
+    "none": "weak",
+}
+
+
+@dataclass(frozen=True)
+class WhyThisResult:
+    """Deterministic 'Why this result?' explanation for one candidate standard.
+
+    Built entirely from the retrieval engine's MatchReason data - never from an
+    LLM. `signals` lists, in a fixed order, each field the query matched in;
+    `summary` is a single plain sentence; `strength` mirrors retrieval
+    confidence (strong / moderate / weak).
+    """
+
+    standard_number: str
+    strength: str
+    signals: list[str]
+    summary: str
+
+
+def explain_candidate(result: RetrievalResult) -> WhyThisResult:
+    """Turn a RetrievalResult's deterministic MatchReasons into an explanation.
+
+    Pure function: same input -> same output, no I/O, no LLM.
+    """
+    # Group the match reasons by field, keeping the distinct terms in order.
+    terms_by_field: dict[str, list[str]] = {}
+    for reason in result.reasons:
+        bucket = terms_by_field.setdefault(reason.field, [])
+        if reason.term not in bucket:
+            bucket.append(reason.term)
+
+    signals: list[str] = []
+    for field_name in _FIELD_ORDER:
+        terms = terms_by_field.get(field_name)
+        if not terms:
+            continue
+        phrase = _FIELD_PHRASES[field_name]
+        if field_name == "category":
+            signals.append(phrase)
+        else:
+            signals.append(f"{phrase} ({', '.join(terms)})")
+
+    strength = _STRENGTH.get(result.confidence, "weak")
+
+    if not signals:  # defensive: a scored result always has at least one reason
+        joined = "the query matched the BIS evidence for this standard"
+    elif len(signals) == 1:
+        joined = signals[0]
+    elif len(signals) == 2:
+        joined = f"{signals[0]} and {signals[1]}"
+    else:
+        joined = "; ".join(signals[:-1]) + "; and " + signals[-1]
+
+    summary = (
+        f"Retrieved as a candidate standard ({strength} match) because {joined}."
+    )
+
+    return WhyThisResult(
+        standard_number=result.item.standard_number or "",
+        strength=strength,
+        signals=signals,
+        summary=summary,
+    )
+
+
+# Standing caveat attached to a grounded Product -> Standard response so the UI
+# never implies a legal decision the retrieval engine did not make.
+_GROUNDED_NOTE = (
+    "Candidate Indian Standards retrieved from the BIS knowledge base and ranked "
+    "by deterministic lexical match. A high match score indicates relevance to "
+    "the description, not a legal determination of applicability."
+)
 
 
 @dataclass(frozen=True)
@@ -17,6 +120,9 @@ class ProductStandardOutcome:
     confidence: str
     grounded: bool
     note: str = ""
+    # Phase 9: one deterministic "Why this result?" explanation per entry in
+    # `results`, in the same order. Empty when the query abstained.
+    explanations: list[WhyThisResult] = field(default_factory=list)
 
 
 class ProductStandardFinder:
@@ -89,4 +195,6 @@ class ProductStandardFinder:
             results=candidates,
             confidence=candidates[0].confidence,
             grounded=True,
+            note=_GROUNDED_NOTE,
+            explanations=[explain_candidate(result) for result in candidates],
         )

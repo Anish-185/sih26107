@@ -151,7 +151,21 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-*Current status: Phase 8 complete — Hallmarking / HUID information. Phase 8 adds
+*Current status: Phase 9 complete — deterministic "Why this result?" for
+Product -> Standard discovery. Phase 9 adds NO new endpoint, NO new retrieval
+engine and NO LLM call. The Phase 3 `SearchEngine` already records every scoring
+point as a `MatchReason`; `app/product.py` gains a pure function
+`explain_candidate(RetrievalResult) -> WhyThisResult` that turns those existing
+reasons into a fixed-order list of `signals` plus one plain-language `summary`
+("Retrieved as a candidate standard (strong/moderate/weak match) because …").
+`strength` mirrors retrieval confidence; the wording never claims legal
+applicability. `ProductStandardOutcome` gains a parallel `explanations` list
+(empty on abstention) and a standing grounded `note`; `POST /product-standard`
+exposes it as `why` on each result (alongside the untouched raw `reasons`).
+Frontend: `StandardsView.tsx` shows `result.why.summary` as the lead of the
+"Why this result" block, keeping the detailed reason breakdown beneath. Tests:
+`backend/tests/test_why_this_result.py` (41 checks).
+Phase 8 recap: Hallmarking / HUID information. Phase 8 added
 NO new retrieval engine and NO new endpoint: hallmarking / HUID questions go
 through the existing deterministic `SearchEngine` + grounded `/ask` pipeline
 (`app/rag.py`). The curated KB's `hallmarking` category (plus hallmarking FAQs
@@ -181,7 +195,7 @@ labelled placeholder data (`frontend/src/mocks.tsx`, `<MockDataBanner/>`)
 because the backend has no OCR/rules engine. Run: backend on :8000, then
 `cd frontend && npm install && npm run dev` (proxies `/api` -> :8000).
 
-Next backend milestone: Phase 9 (Why this result).
+Next backend milestone: Phase 10 (UI polish).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -197,7 +211,7 @@ sih26107/
       api.py           # /search, /ask, /product-standard, /certification-guidance
       llm.py           # LM Studio / Qwen3-8B local LLM adapter
       rag.py           # grounded BIS question-answering pipeline (/ask)
-      product.py       # Phase 5: Product -> Standard discovery
+      product.py       # Phase 5: Product -> Standard discovery + Phase 9 "Why this result?"
       certification.py # Phase 6: BIS certification guidance
       laboratory.py    # Phase 7: BIS-recognized laboratory search
       knowledge/       # knowledge-base schema + loader
@@ -215,6 +229,7 @@ sih26107/
       test_certification.py # plain-Python checks for certification guidance
       test_laboratory.py   # plain-Python checks for laboratory search
       test_hallmarking.py  # plain-Python checks for hallmarking / HUID (via /ask)
+      test_why_this_result.py # plain-Python checks for deterministic why-this-result
     requirements.txt
     .env.example
   data/
