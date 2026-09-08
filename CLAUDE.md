@@ -151,7 +151,22 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-*Current status: Phase 9 complete — deterministic "Why this result?" for
+*Current status: Phase 11 complete — testing. No application code changed.
+Added `backend/tests/test_rag.py` (dedicated grounded-RAG / `/ask` coverage:
+evidence reaches the LLM, abstention makes no LLM call, sources preserved,
+`/ask` returns 503 on an LLM outage, no invented standard numbers, system-prompt
+trust rules), `backend/tests/test_api_contract.py` (drives the real ASGI app via
+`TestClient`: every endpoint's shape + status codes, `limit` bounds -> 422,
+malformed body -> 422, an adversarial product sweep proving every returned
+`standard_number` exists in the KB), and `backend/tests/test_plain_runners.py`
+(a pytest bridge that runs every plain-Python runner as a subprocess and fails
+if any exits non-zero — so `python -m pytest -q` is now an authoritative gate,
+not just the direct runners). Fake / raising local-model stand-ins keep every
+LLM test deterministic and independent of LM Studio.
+Phase 10 recap: targeted frontend polish only (no visual-identity change) —
+`standardTitle()` helper, "Why this result" hierarchy, calmer timeout/model
+error copy.
+Phase 9 recap: deterministic "Why this result?" for
 Product -> Standard discovery. Phase 9 adds NO new endpoint, NO new retrieval
 engine and NO LLM call. The Phase 3 `SearchEngine` already records every scoring
 point as a `MatchReason`; `app/product.py` gains a pure function
@@ -195,7 +210,7 @@ labelled placeholder data (`frontend/src/mocks.tsx`, `<MockDataBanner/>`)
 because the backend has no OCR/rules engine. Run: backend on :8000, then
 `cd frontend && npm install && npm run dev` (proxies `/api` -> :8000).
 
-Next backend milestone: Phase 10 (UI polish).
+Next backend milestone: Phase 12 (demo hardening).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -222,14 +237,18 @@ sih26107/
         engine.py      # SearchEngine, scoring, ranking, confidence, abstention
     scripts/
       check_knowledge.py   # CLI: validate the knowledge base
-    tests/
-      test_knowledge.py    # plain-Python checks (no test framework)
-      test_retrieval.py    # plain-Python checks for search + /search API
-      test_product.py      # plain-Python checks for Product -> Standard
-      test_certification.py # plain-Python checks for certification guidance
-      test_laboratory.py   # plain-Python checks for laboratory search
-      test_hallmarking.py  # plain-Python checks for hallmarking / HUID (via /ask)
-      test_why_this_result.py # plain-Python checks for deterministic why-this-result
+    tests/                 # plain-Python runners: `./.venv/bin/python tests/<file>`
+      test_knowledge.py    # KB schema + loader (broken-KB fixtures)
+      test_retrieval.py    # retrieval ranking / abstention + /search API
+      test_product.py      # Product -> Standard
+      test_why_this_result.py # deterministic why-this-result
+      test_certification.py # certification guidance
+      test_laboratory.py   # laboratory search
+      test_hallmarking.py  # hallmarking / HUID (via /ask)
+      test_rag.py          # grounded RAG pipeline + /ask (fake LLM, 503 path)
+      test_api_contract.py # real ASGI app via TestClient: shapes, 422, 404, 503
+      test_plain_runners.py # pytest bridge — runs every runner, makes pytest authoritative
+      fixtures/broken_kb/  # deliberately invalid KB for the loader tests
     requirements.txt
     .env.example
   data/
