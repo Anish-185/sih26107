@@ -28,18 +28,18 @@ npm run preview        # serve dist/ on :4173
 
 | Screen | Endpoint | Live? |
 |---|---|---|
+| Inspection · OCR + declarations + product + standard | `POST /inspection/analyze` | ✅ real (Phase 14) |
 | Standards | `POST /product-standard` | ✅ real |
 | Certification | `POST /certification-guidance` | ✅ real (local LLM) |
 | Laboratories | `POST /laboratory-search` | ✅ real (`explain=false` by default) |
 | Hallmarking / HUID | `POST /ask` | ✅ real (local LLM) |
 | Header status dot | `GET /health` | ✅ real |
-| Inspection · applicable standard | `POST /product-standard` | ✅ real |
-| Inspection · OCR / declarations / checks / result | — | ⚠️ mock (`src/mocks.tsx`) |
+| Inspection · legal-metrology PASS/FAIL | — | ⏳ next phase (shown as `NEXT`) |
 | History / Review | — | ⚠️ mock (`src/mocks.tsx`) |
 
-The backend has no OCR / rules / compliance engine yet, so those surfaces run on
-clearly-labelled placeholder data (`MockDataBanner` is shown on every screen that
-uses it). No fabricated compliance outcomes are presented as real.
+The legal-metrology rule engine and the officer report are not built yet, so
+History / Review run on clearly-labelled placeholder data (`MockDataBanner`). No
+fabricated compliance outcomes are presented as real.
 
 ## Structure
 
