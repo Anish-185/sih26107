@@ -30,7 +30,7 @@ class LocalLLM:
             base_url
             or os.getenv("LLM_BASE_URL", "http://127.0.0.1:1234/v1")
         ).rstrip("/")
-        self.model = model or os.getenv("LLM_MODEL", "qwen/qwen3-8b")
+        self.model = model or os.getenv("LLM_MODEL", "qwen/qwen3-4b")
         self.timeout = timeout
 
     def generate(

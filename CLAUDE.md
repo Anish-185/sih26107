@@ -237,7 +237,7 @@ sih26107/
     app/
       main.py          # FastAPI app: /health + the api.py router
       api.py           # /search, /ask, /product-standard, /certification-guidance
-      llm.py           # LM Studio / Qwen3-8B local LLM adapter
+      llm.py           # LM Studio / Qwen3-4B local LLM adapter
       rag.py           # grounded BIS question-answering pipeline (/ask)
       product.py       # Phase 5: Product -> Standard discovery + Phase 9 "Why this result?"
       certification.py # Phase 6: BIS certification guidance

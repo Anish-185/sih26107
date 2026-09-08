@@ -80,12 +80,14 @@ Check it works:
 
 `/ask`, `/certification-guidance` and `/laboratory-search?explain=true` call a
 local [LM Studio](https://lmstudio.ai) server that exposes an OpenAI-compatible
-API. Load a small instruction model (default: `qwen/qwen3-8b`) and start the
-LM Studio server on port `1234`. Override with environment variables if needed:
+API. Load a small instruction model (default: `qwen/qwen3-4b`) and start the
+LM Studio server on port `1234`. On a laptop, load it with `--parallel 1` so
+concurrent requests queue instead of thrashing the model. Override with
+environment variables if needed:
 
 ```bash
 export LLM_BASE_URL=http://127.0.0.1:1234/v1   # default
-export LLM_MODEL=qwen/qwen3-8b                  # default
+export LLM_MODEL=qwen/qwen3-4b                  # default
 ```
 
 If LM Studio is not running, the deterministic endpoints (`/search`,
