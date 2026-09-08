@@ -1,7 +1,12 @@
-"""HTTP layer for retrieval: GET/POST /search.
+"""HTTP layer for retrieval and grounded question answering.
 
-This is a thin adapter. All the logic lives in app.retrieval; here we only turn a
-request into a query string and turn a SearchOutcome into JSON.
+Endpoints:
+  - GET/POST /search
+  - POST /ask
+
+/search remains deterministic lexical retrieval.
+/ask retrieves BIS evidence first, then uses the local Qwen3 model
+to generate an answer grounded in that evidence.
 """
 
 from __future__ import annotations
@@ -9,9 +14,11 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from app.llm import LLMError, LocalLLM
+from app.rag import BISQuestionAnswerer
 from app.retrieval import RetrievalResult, SearchEngine, SearchOutcome
 
 router = APIRouter(tags=["search"])
@@ -21,6 +28,15 @@ router = APIRouter(tags=["search"])
 def get_engine() -> SearchEngine:
     """One SearchEngine for the whole process (loads the knowledge base once)."""
     return SearchEngine()
+
+
+@lru_cache(maxsize=1)
+def get_answerer() -> BISQuestionAnswerer:
+    """One grounded QA pipeline for the whole process."""
+    return BISQuestionAnswerer(
+        search_engine=get_engine(),
+        llm=LocalLLM(),
+    )
 
 
 # --------------------------------------------------------------------- responses
@@ -68,6 +84,43 @@ class SearchRequest(BaseModel):
     limit: int | None = Field(default=None, ge=1, le=50)
 
 
+# --------------------------------------------------------------------- ask models
+
+
+class SourceOut(BaseModel):
+    id: str
+    title: str
+    category: str
+    standard_number: str | None = None
+    score: float
+    confidence: str
+    matched_terms: list[str]
+    source_organization: str
+    source_url: str | None = None
+    document_name: str | None = None
+    reference: str | None = None
+    verification_status: str
+    last_verified: str | None = None
+
+
+class AskRequest(BaseModel):
+    question: str = Field(
+        default="",
+        description="Question about BIS standards or BIS information",
+    )
+
+
+class AskResponse(BaseModel):
+    question: str
+    answer: str
+    grounded: bool
+    source_count: int
+    sources: list[SourceOut]
+
+
+# --------------------------------------------------------------------- helpers
+
+
 def _result_to_out(result: RetrievalResult) -> ResultOut:
     item = result.item
     return ResultOut(
@@ -79,7 +132,12 @@ def _result_to_out(result: RetrievalResult) -> ResultOut:
         confidence=result.confidence,
         matched_terms=result.matched_terms,
         reasons=[
-            ReasonOut(field=r.field, term=r.term, weight=r.weight, detail=r.detail)
+            ReasonOut(
+                field=r.field,
+                term=r.term,
+                weight=r.weight,
+                detail=r.detail,
+            )
             for r in result.reasons
         ],
         standard_number=item.standard_number,
@@ -88,7 +146,11 @@ def _result_to_out(result: RetrievalResult) -> ResultOut:
         document_name=item.document_name,
         reference=item.reference,
         verification_status=item.verification_status,
-        last_verified=item.last_verified.isoformat() if item.last_verified else None,
+        last_verified=(
+            item.last_verified.isoformat()
+            if item.last_verified
+            else None
+        ),
     )
 
 
@@ -106,6 +168,30 @@ def _outcome_to_response(outcome: SearchOutcome) -> SearchResponse:
     )
 
 
+def _result_to_source(result: RetrievalResult) -> SourceOut:
+    item = result.item
+
+    return SourceOut(
+        id=item.id,
+        title=item.title,
+        category=item.category,
+        standard_number=item.standard_number,
+        score=result.score,
+        confidence=result.confidence,
+        matched_terms=result.matched_terms,
+        source_organization=item.source_organization,
+        source_url=item.source_url,
+        document_name=item.document_name,
+        reference=item.reference,
+        verification_status=item.verification_status,
+        last_verified=(
+            item.last_verified.isoformat()
+            if item.last_verified
+            else None
+        ),
+    )
+
+
 # --------------------------------------------------------------------- routes
 
 
@@ -119,4 +205,42 @@ def search_get(
 
 @router.post("/search", response_model=SearchResponse)
 def search_post(request: SearchRequest) -> SearchResponse:
-    return _outcome_to_response(get_engine().search(request.query, request.limit))
+    return _outcome_to_response(
+        get_engine().search(request.query, request.limit)
+    )
+
+
+@router.post("/ask", response_model=AskResponse)
+def ask_post(request: AskRequest) -> AskResponse:
+    question = request.question.strip()
+
+    if not question:
+        return AskResponse(
+            question="",
+            answer=(
+                "Please provide a question about BIS standards or "
+                "BIS information."
+            ),
+            grounded=False,
+            source_count=0,
+            sources=[],
+        )
+
+    try:
+        result = get_answerer().ask(question)
+    except LLMError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Local LLM unavailable: {exc}",
+        ) from exc
+
+    return AskResponse(
+        question=question,
+        answer=result.answer,
+        grounded=bool(result.results),
+        source_count=len(result.results),
+        sources=[
+            _result_to_source(result_item)
+            for result_item in result.results
+        ],
+    )
