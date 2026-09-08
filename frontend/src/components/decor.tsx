@@ -250,13 +250,19 @@ export function Annotation({
 /* ---------------------------------------------------------------- Figurine --- */
 
 /**
- * The MetrIQ institutional figurine — the actual blue-toned Ashoka Lion Capital
- * artwork from the project reference set (`public/lion-capital.png`, background
- * knocked out to transparent). Treated as editorial artwork: `multiply` blends
- * its anti-aliased edge into the warm paper so it reads as printed, not pasted.
- * Position / crop / bleed via `className` at the call site.
+ * The MetrIQ institutional figurine — the actual blue-duotone Ashoka Lion
+ * Capital archival image (`public/lion-capital.png`: a CC0 photograph of the
+ * Sarnath sculpture, treated to a cobalt duotone with a feathered vignette so
+ * it dissolves into the page). Treated as editorial artwork — position, crop
+ * and bleed it via `className` at the call site.
  */
-export function Figurine({ className }: { className?: string }) {
+export function Figurine({
+  className,
+  blend = "normal",
+}: {
+  className?: string;
+  blend?: "normal" | "multiply" | "luminosity";
+}) {
   return (
     <img
       src="/lion-capital.png"
@@ -264,7 +270,7 @@ export function Figurine({ className }: { className?: string }) {
       aria-hidden
       draggable={false}
       className={cn("pointer-events-none select-none", className)}
-      style={{ mixBlendMode: "multiply" }}
+      style={blend === "normal" ? undefined : { mixBlendMode: blend }}
     />
   );
 }

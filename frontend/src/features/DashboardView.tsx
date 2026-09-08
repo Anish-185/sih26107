@@ -119,42 +119,46 @@ export function DashboardView() {
           </dl>
         </div>
 
-        {/* right — the Lion Capital artwork, art-directed: grid behind,
-            squares + thin annotations around, image cropped and bleeding
-            past the top and the right edge. */}
-        <div className="relative -mx-5 mt-4 h-[360px] sm:mx-0 sm:h-[460px] lg:h-[520px]">
+        {/* right — the blue Lion Capital archival image, art-directed:
+            faint grid behind, small blue markers + thin annotations around,
+            the image cropped and bleeding past the top and right edge. */}
+        <div className="relative -mx-5 mt-2 h-[380px] sm:mx-0 sm:h-[480px] lg:h-[540px]">
           <BlueprintField
-            className="left-[8%] right-0 top-[8%] bottom-[12%] lg:-right-8 lg:-top-12"
+            className="inset-x-[6%] top-[6%] bottom-[10%] lg:-right-10 lg:-top-14"
             drift
-          />
-          <span
-            className="absolute left-[10%] right-[2%] top-1/2 hidden h-px bg-accent/20 sm:block"
-            aria-hidden
           />
           <SquareField
             className="hidden sm:block"
             connect={false}
             squares={[
-              { x: 12, y: 20, s: 10, v: "mid" },
-              { x: 6, y: 40, s: 16, v: "soft" },
-              { x: 19, y: 58, s: 7, v: "outline" },
-              { x: 92, y: 16, s: 14, v: "solid" },
-              { x: 97, y: 34, s: 8, v: "outline" },
-              { x: 90, y: 78, s: 12, v: "mid" },
+              { x: 9, y: 18, s: 10, v: "mid" },
+              { x: 4, y: 38, s: 16, v: "soft" },
+              { x: 16, y: 56, s: 7, v: "outline" },
+              { x: 95, y: 14, s: 14, v: "solid" },
+              { x: 98, y: 32, s: 8, v: "outline" },
+              { x: 93, y: 74, s: 12, v: "mid" },
             ]}
           />
 
-          {/* the artwork — anchored to the bottom, cropped off the top,
-              extending slightly past the right edge of the column */}
-          <Figurine className="metriq-rise absolute bottom-0 right-[6%] h-[112%] w-auto max-w-none object-contain object-bottom sm:right-[10%] lg:right-[8%]" />
+          {/* the archival image — a blue plate, cropped at the top and
+              bleeding past the right edge of the column */}
+          <Figurine
+            blend="normal"
+            className="metriq-rise absolute -top-6 bottom-0 right-[-4%] w-[74%] max-w-none object-cover object-top sm:right-[-2%] sm:w-[66%] lg:-right-6 lg:w-[62%]"
+          />
 
-          <Annotation lead="right" className="absolute left-[2%] top-[10%] hidden sm:inline-flex">
+          {/* measurement annotations around the artwork */}
+          <Annotation lead="right" className="absolute left-[2%] top-[12%] hidden sm:inline-flex">
             Measure → Verify
           </Annotation>
-          <Annotation className="absolute left-[2%] top-[46%] hidden md:inline-flex">
+          <Annotation className="absolute left-[2%] top-[44%] hidden md:inline-flex">
             Evidence first
           </Annotation>
-          <div className="absolute bottom-[4%] left-[2%] hidden sm:block">
+          <span
+            className="absolute left-[3%] top-[52%] hidden h-px w-[18%] bg-accent/30 md:block"
+            aria-hidden
+          />
+          <div className="absolute bottom-[6%] left-[2%] hidden sm:block">
             <span className="flex items-center gap-2" aria-hidden>
               <span className="h-1.5 w-1.5 bg-accent" />
               <span className="h-px w-14 bg-accent/40" />
@@ -254,14 +258,18 @@ export function DashboardView() {
       </section>
 
       {/* ===================================== photographic punctuation */}
-      <div className="relative -mx-5 h-16 overflow-hidden sm:mx-0 sm:h-20">
+      <div className="relative -mx-5 h-20 overflow-hidden sm:mx-0 sm:h-24">
         <PhotoFragment
           src="/blue-botanical.png"
-          className="h-full w-full object-cover object-[20%_42%]"
+          className="absolute inset-0 h-full w-full object-cover object-[30%_45%]"
         />
-        <span className="absolute inset-0 bg-accent/10" aria-hidden />
-        <div className="absolute inset-0 flex items-center justify-between px-5 sm:px-6">
-          <Annotation className="!text-white/70">Every finding · one source</Annotation>
+        <span className="absolute inset-0 bg-accent/25 mix-blend-multiply" aria-hidden />
+        <div className="absolute inset-0 flex items-center justify-between px-5 sm:px-8">
+          <span className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-white/80">
+            Every finding
+            <ArrowRight className="h-3.5 w-3.5" />
+            one source
+          </span>
           <Annotation className="!text-white/70">BIS / India</Annotation>
         </div>
       </div>

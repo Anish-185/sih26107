@@ -1,0 +1,13 @@
+Image assets in this directory
+==============================
+
+lion-capital.png, lion-capital-detail.png
+  Derived from "Lion Capital of Ashoka 3.jpg" by Wikimedia Commons contributor,
+  released under CC0 1.0 (public domain dedication).
+  https://commons.wikimedia.org/wiki/File:Lion_Capital_of_Ashoka_3.jpg
+  Treatment: cropped, converted to a cobalt duotone, feathered edge mask.
+  A photograph of the historical Sarnath sculpture (Sarnath Museum) — not the
+  State Emblem of India.
+
+blue-botanical.png, blue-botanical-strip.png
+  Cropped from the project's own reference set (front/screenshot-2026-09-08_17-01-07.png).

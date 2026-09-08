@@ -48,12 +48,11 @@ export function HallmarkingView() {
       <div className="relative">
         {/* Lion Capital detail — an Indian-institutional fragment bleeding off
             the right edge, in the header's whitespace. */}
-        <div className="pointer-events-none absolute -right-5 top-0 hidden h-[112%] w-[30%] overflow-hidden sm:-right-8 md:block">
+        <div className="pointer-events-none absolute -right-5 top-0 hidden h-[124%] w-[32%] overflow-hidden sm:-right-8 md:block">
           <BlueprintField fade="bottom" />
           <PhotoFragment
             src="/lion-capital-detail.png"
-            blend="multiply"
-            className="absolute -right-6 top-4 h-[88%] w-auto max-w-none object-cover object-left opacity-70"
+            className="absolute -right-8 top-2 w-[120%] max-w-none object-cover object-left opacity-95"
           />
           <Bracket tone="line" className="inset-4" />
           <Annotation className="absolute bottom-2 left-2">

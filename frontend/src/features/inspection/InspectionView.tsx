@@ -24,6 +24,7 @@ import {
   BlueprintField,
   Bracket,
   PhotoFragment,
+  Ticks,
 } from "@/components/decor";
 import { ImageInspector } from "./ImageInspector";
 import {
@@ -112,18 +113,29 @@ export function InspectionView() {
           ))}
         </ol>
 
-        <div className="relative overflow-hidden">
-          <BlueprintField fade="radial" />
-          {/* a blue photographic margin down the left edge of the upload zone */}
-          <PhotoFragment
-            src="/blue-botanical.png"
-            blend="multiply"
-            className="absolute inset-y-0 left-0 hidden w-10 object-cover object-left opacity-30 sm:block md:w-16"
-          />
-          <Bracket tone="accent" className="-inset-2" />
-          <div className="relative">
-            <Dropzone onFiles={start} />
+        {/* the upload zone as a scanning bay: photographic side margins,
+            corner brackets, measurement ticks, a place-evidence label. */}
+        <div className="relative">
+          <Annotation className="absolute -top-6 left-0 hidden sm:inline-flex">
+            Place evidence
+          </Annotation>
+          <div className="relative overflow-hidden border border-line-strong bg-surface">
+            <BlueprintField fade="radial" />
+            <PhotoFragment
+              src="/blue-botanical.png"
+              className="absolute inset-y-0 left-0 hidden w-12 object-cover object-[8%_45%] opacity-40 md:block lg:w-20"
+            />
+            <PhotoFragment
+              src="/blue-botanical.png"
+              className="absolute inset-y-0 right-0 hidden w-12 scale-x-[-1] object-cover object-[8%_45%] opacity-40 md:block lg:w-20"
+            />
+            <Ticks edge="top" count={13} className="opacity-60" />
+            <Ticks edge="bottom" count={13} className="opacity-60" />
+            <div className="relative [&>div]:!border-0 [&>div]:!bg-transparent">
+              <Dropzone onFiles={start} />
+            </div>
           </div>
+          <Bracket tone="accent" className="-inset-2" />
           <Annotation className="absolute -bottom-6 right-0">
             PNG · JPG · WEBP
           </Annotation>
