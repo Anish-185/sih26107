@@ -151,9 +151,11 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-**Current status: Phase 3 complete — deterministic lexical retrieval
-(`app/retrieval/`) over the 88-record knowledge base, exposed as `GET/POST /search`.
-No LLM/RAG/embeddings/database. Next: Phase 4 (RAG / AI answers).**
+*Current status: Phase 4 complete — grounded local LLM question answering
+(`app/rag.py` + `app/llm.py`) exposed as `POST /ask`, using deterministic
+retrieval as the source of truth and Qwen3-8B locally through LM Studio.
+Unsupported questions abstain instead of being answered from model knowledge.
+Next: Phase 5 (Product -> Standard).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -165,12 +167,14 @@ sih26107/
   README.md            # setup & run instructions
   backend/             # Python + FastAPI service
     app/
-      main.py          # FastAPI app: /health, /search
-      api.py           # GET/POST /search — thin adapter over app.retrieval
+      main.py          # FastAPI app: /health, /search, /ask
+      api.py           # GET/POST /search + POST /ask
+      llm.py           # LM Studio / Qwen3-8B local LLM adapter
+      rag.py           # grounded BIS question-answering pipeline
       knowledge/       # knowledge-base schema + loader
         schema.py      # KnowledgeItem pydantic model + validation rules
         loader.py      # load + validate data/knowledge/, report every problem
-      retrieval/       # Phase 3: deterministic lexical search (no LLM)
+      retrieval/       # Phase 3: deterministic lexical search
         text.py        # normalize / tokenize / parse standard numbers
         engine.py      # SearchEngine, scoring, ranking, confidence, abstention
     scripts/
