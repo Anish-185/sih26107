@@ -76,7 +76,8 @@ _UNIT_CANON = {
     "mg": "mg",
     "ml": "ml", "milliliter": "ml", "millilitre": "ml",
     "l": "l", "ltr": "l", "litre": "l", "liter": "l", "litres": "l", "liters": "l",
-    "pcs": "pcs", "pc": "pcs", "piece": "pcs", "pieces": "pcs", "n": "pcs", "u": "pcs",
+    # "N" is the Legal Metrology unit for a count of articles.
+    "n": "N", "u": "N", "pcs": "N", "pc": "N", "piece": "N", "pieces": "N",
 }
 
 

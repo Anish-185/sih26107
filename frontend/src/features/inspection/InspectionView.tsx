@@ -599,9 +599,6 @@ function DeclarationsPanel({
                     <div className="kicker">{d.label}</div>
                     <div className="mt-1 text-[13px] font-medium text-ink">
                       {d.value}
-                      {d.unit && d.unit !== "INR" ? (
-                        <span className="text-ink-faint"> {d.unit}</span>
-                      ) : null}
                     </div>
                     <Mono muted className="mt-0.5 block text-[10px]">
                       {d.source_region_id ?? "—"} ·{" "}
