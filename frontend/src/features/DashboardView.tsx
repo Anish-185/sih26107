@@ -10,14 +10,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { LinkButton, Mono, StatusBadge } from "@/components/ui";
-import {
-  Annotation,
-  Bracket,
-  BlueprintField,
-  Figurine,
-  PhotoFragment,
-  SquareField,
-} from "@/components/decor";
+import { Annotation, Figurine, PhotoFragment } from "@/components/decor";
 import {
   MOCK_DASHBOARD_STATS,
   listMockInspections,
@@ -47,11 +40,10 @@ const SURFACES: Surface[] = [
   { to: "/hallmarking", label: "Hallmarking / HUID", hint: "Grounded hallmarking information", icon: Gem },
 ];
 
-const SIGNAL: [string, string][] = [
-  ["Retrieval", "Deterministic lexical search"],
-  ["Source of truth", "Curated BIS knowledge base"],
-  ["Language model", "Explains retrieved evidence only"],
-  ["On weak evidence", "Abstains — never guesses"],
+const FLOW: [string, string, string][] = [
+  ["Retrieval", "Source of truth", "Deterministic lexical search over the curated BIS knowledge base"],
+  ["Evidence", "Language model", "Ranks and explains only what retrieval already found"],
+  ["Verification", "On weak evidence", "Abstains — never guesses; every finding traces to a BIS source"],
 ];
 
 export function DashboardView() {
@@ -119,52 +111,11 @@ export function DashboardView() {
           </dl>
         </div>
 
-        {/* right — the blue Lion Capital archival image, art-directed:
-            faint grid behind, small blue markers + thin annotations around,
-            the image cropped and bleeding past the top and right edge. */}
-        <div className="relative -mx-5 mt-2 h-[380px] sm:mx-0 sm:h-[480px] lg:h-[540px]">
-          <BlueprintField
-            className="inset-x-[6%] top-[6%] bottom-[10%] lg:-right-10 lg:-top-14"
-            drift
-          />
-          <SquareField
-            className="hidden sm:block"
-            connect={false}
-            squares={[
-              { x: 9, y: 18, s: 10, v: "mid" },
-              { x: 4, y: 38, s: 16, v: "soft" },
-              { x: 16, y: 56, s: 7, v: "outline" },
-              { x: 95, y: 14, s: 14, v: "solid" },
-              { x: 98, y: 32, s: 8, v: "outline" },
-              { x: 93, y: 74, s: 12, v: "mid" },
-            ]}
-          />
-
-          {/* the archival image — a blue plate, cropped at the top and
-              bleeding past the right edge of the column */}
-          <Figurine
-            blend="normal"
-            className="metriq-rise absolute -top-6 bottom-0 right-[-4%] w-[74%] max-w-none object-cover object-top sm:right-[-2%] sm:w-[66%] lg:-right-6 lg:w-[62%]"
-          />
-
-          {/* measurement annotations around the artwork */}
-          <Annotation lead="right" className="absolute left-[2%] top-[12%] hidden sm:inline-flex">
-            Measure → Verify
-          </Annotation>
-          <Annotation className="absolute left-[2%] top-[44%] hidden md:inline-flex">
-            Evidence first
-          </Annotation>
-          <span
-            className="absolute left-[3%] top-[52%] hidden h-px w-[18%] bg-accent/30 md:block"
-            aria-hidden
-          />
-          <div className="absolute bottom-[6%] left-[2%] hidden sm:block">
-            <span className="flex items-center gap-2" aria-hidden>
-              <span className="h-1.5 w-1.5 bg-accent" />
-              <span className="h-px w-14 bg-accent/40" />
-            </span>
-            <Annotation className="mt-2 inline-flex">BIS / India</Annotation>
-          </div>
+        {/* right — the reference hero plate (Lion Capital + its own blueprint
+            dimension lines, brackets, markers and annotations), cropped at the
+            top and bleeding a little past the right edge of the column. */}
+        <div className="relative -mr-5 mt-4 min-h-[380px] sm:mr-0 sm:min-h-[440px] lg:min-h-[520px]">
+          <Figurine className="metriq-rise absolute -top-6 right-0 w-[92%] max-w-none sm:-top-10 sm:w-[86%] lg:-right-8 lg:-top-14 lg:w-[82%]" />
         </div>
       </section>
 
@@ -258,19 +209,20 @@ export function DashboardView() {
       </section>
 
       {/* ===================================== photographic punctuation */}
-      <div className="relative -mx-5 h-20 overflow-hidden sm:mx-0 sm:h-24">
+      <div className="relative -mx-5 h-20 overflow-hidden bg-ink sm:mx-0 sm:h-24">
         <PhotoFragment
           src="/blue-botanical.png"
-          className="absolute inset-0 h-full w-full object-cover object-[30%_45%]"
+          blend="luminosity"
+          className="absolute inset-0 h-full w-full object-cover object-[35%_45%] opacity-70"
         />
-        <span className="absolute inset-0 bg-accent/25 mix-blend-multiply" aria-hidden />
-        <div className="absolute inset-0 flex items-center justify-between px-5 sm:px-8">
-          <span className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-white/80">
+        <span className="absolute inset-0 bg-accent/40 mix-blend-color" aria-hidden />
+        <div className="relative flex h-full items-center justify-between px-5 sm:px-8">
+          <span className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-white/85">
             Every finding
             <ArrowRight className="h-3.5 w-3.5" />
             one source
           </span>
-          <Annotation className="!text-white/70">BIS / India</Annotation>
+          <span className="annotation !text-white/70">BIS / India</span>
         </div>
       </div>
 
@@ -323,21 +275,33 @@ export function DashboardView() {
         <div>
           <div className="mb-6 border-b border-line pb-4">
             <span className="eyebrow">How MetrIQ answers</span>
-            <h2 className="display mt-2 text-xl">The one rule</h2>
+            <h2 className="display mt-2 text-xl">Retrieval → Evidence → Verification</h2>
           </div>
-          <div className="relative border border-line bg-surface">
-            <Bracket tone="accent" size="sm" />
-            <dl className="divide-y divide-line">
-              {SIGNAL.map(([k, v]) => (
-                <div key={k} className="flex items-baseline justify-between gap-4 px-5 py-3.5">
-                  <dt className="kicker">{k}</dt>
-                  <dd className="text-right text-[12px] text-ink">{v}</dd>
+          <ol className="relative">
+            {FLOW.map(([step, label, detail], i) => (
+              <li key={step} className="relative pb-8 pl-8 last:pb-0">
+                {i < FLOW.length - 1 && (
+                  <span
+                    className="absolute left-[7px] top-6 h-full w-px bg-line"
+                    aria-hidden
+                  />
+                )}
+                <span
+                  className="absolute left-0 top-1 h-3.5 w-3.5 border border-accent bg-paper"
+                  aria-hidden
+                />
+                <div className="flex items-baseline gap-3">
+                  <span className="display text-[1.35rem] leading-none">{step}</span>
+                  <span className="kicker">{label}</span>
                 </div>
-              ))}
-            </dl>
-            <div className="border-t border-line px-5 py-3">
-              <Annotation>Verified BIS sources only</Annotation>
-            </div>
+                <p className="mt-1.5 text-[12px] leading-relaxed text-ink-soft">
+                  {detail}
+                </p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-2 border-t border-line pt-3">
+            <Annotation>Verified BIS sources only</Annotation>
           </div>
         </div>
       </section>

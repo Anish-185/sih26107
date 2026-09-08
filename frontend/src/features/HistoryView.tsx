@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Mono, PageHeader, StatusBadge } from "@/components/ui";
-import { Annotation } from "@/components/decor";
+import { HeaderMotif } from "@/components/decor";
 import { MockDataBanner, listMockInspections } from "@/mocks";
 import { formatDate } from "@/lib/format";
 
@@ -16,12 +16,14 @@ export function HistoryView() {
 
   return (
     <div className="space-y-10">
-      <PageHeader
-        eyebrow="History"
-        title="Inspection history"
-        lead="Every inspection MetrIQ has processed, with its verification state."
-        annotation={<Annotation lead="right">{`${rows.length} records`}</Annotation>}
-      />
+      <div className="relative">
+        <HeaderMotif name="mountain" label={`${rows.length} records`} width="w-[26%]" />
+        <PageHeader
+          eyebrow="History"
+          title="Inspection history"
+          lead="Every inspection MetrIQ has processed, with its verification state."
+        />
+      </div>
 
       <MockDataBanner scope="This table lists placeholder inspections." />
 

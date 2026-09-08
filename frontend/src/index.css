@@ -9,16 +9,18 @@
   spacing / type / 1px borders, not shadows.
 */
 @theme {
-  --color-paper: #f4f3f0;
-  --color-surface: #faf9f7;
-  --color-raised: #ffffff;
+  /* Warm archival paper — matched exactly to the reference imagery's cream
+     ground so the blue-duotone artwork sits on it with no visible plate edge. */
+  --color-paper: #faf6ea;
+  --color-surface: #fdfaf1;
+  --color-raised: #fffefa;
 
   --color-ink: #17181b;
   --color-ink-soft: #585c63;
   --color-ink-faint: #8b8e94;
 
-  --color-line: #e4e2db;
-  --color-line-strong: #ccc9bf;
+  --color-line: #e8e3d5;
+  --color-line-strong: #d0cbba;
 
   --color-accent: #2246ef;
   --color-accent-hover: #1a37c9;
@@ -60,18 +62,6 @@
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    /*
-      Paper: a barely-there warm vertical wash + a fine tooth of noise, so
-      large empty areas read as stock rather than flat #fff. Both are almost
-      subliminal by design.
-    */
-    background-image:
-      radial-gradient(
-        120% 60% at 50% 0%,
-        rgba(255, 255, 255, 0.6) 0%,
-        transparent 60%
-      );
-    background-attachment: fixed;
   }
 
   ::selection {

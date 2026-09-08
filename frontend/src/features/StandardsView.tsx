@@ -17,7 +17,8 @@ import {
   Annotation,
   BlueprintField,
   Bracket,
-  PhotoFragment,
+  HeaderMotif,
+  Motif,
 } from "@/components/decor";
 
 const EXAMPLES = [
@@ -41,18 +42,15 @@ export function StandardsView() {
 
   return (
     <div className="space-y-12">
-      <PageHeader
-        eyebrow="Product → Standard · Flagship"
-        title="Find the Indian Standard for a product"
-        lead="Describe a product in plain words. MetrIQ runs deterministic retrieval over the curated BIS knowledge base and only returns a standard when the retrieved evidence actually describes that product."
-        annotation={
-          <div className="flex flex-col gap-1">
-            <Annotation lead="right">Retrieval → Evidence</Annotation>
-            <Annotation lead="right">Deterministic · no LLM</Annotation>
-          </div>
-        }
-        size="xl"
-      />
+      <div className="relative">
+        <HeaderMotif name="lotus" label="Precision · purity" width="w-[22%]" />
+        <PageHeader
+          eyebrow="Product → Standard · Flagship"
+          title="Find the Indian Standard for a product"
+          lead="Describe a product in plain words. MetrIQ runs deterministic retrieval over the curated BIS knowledge base and only returns a standard when the retrieved evidence actually describes that product."
+          size="xl"
+        />
+      </div>
 
       {/* search — the flagship affordance */}
       <div className="relative border border-line bg-raised">
@@ -130,10 +128,10 @@ export function StandardsView() {
       {!res && task.error == null && !task.loading && (
         <div className="relative overflow-hidden border border-dashed border-line-strong bg-surface p-10">
           <BlueprintField fade="radial" />
-          {/* blue photographic sliver — a research-desk fragment at the edge */}
-          <PhotoFragment
-            src="/blue-botanical-strip.png"
-            className="absolute right-0 top-0 hidden h-full w-[34%] object-cover object-right opacity-[0.22] [mask-image:linear-gradient(to_left,#000,transparent)] sm:block"
+          {/* blue-duotone motif — a research-desk fragment at the edge */}
+          <Motif
+            name="pillar"
+            className="absolute -right-6 top-1/2 hidden h-[150%] w-auto max-w-none -translate-y-1/2 opacity-[0.5] [mask-image:linear-gradient(to_left,#000_30%,transparent)] sm:block"
           />
           <Bracket tone="line" className="-inset-2" />
           <div className="relative max-w-md">

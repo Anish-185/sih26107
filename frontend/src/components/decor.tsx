@@ -250,11 +250,11 @@ export function Annotation({
 /* ---------------------------------------------------------------- Figurine --- */
 
 /**
- * The MetrIQ institutional figurine — the actual blue-duotone Ashoka Lion
- * Capital archival image (`public/lion-capital.png`: a CC0 photograph of the
- * Sarnath sculpture, treated to a cobalt duotone with a feathered vignette so
- * it dissolves into the page). Treated as editorial artwork — position, crop
- * and bleed it via `className` at the call site.
+ * The MetrIQ hero artwork — the cobalt-duotone Ashoka Lion Capital plate from
+ * the project reference set (`public/hero-lion.png`), which already carries its
+ * own blueprint dimension lines, corner brackets, blue markers and the
+ * MEASURE → VERIFY / EVIDENCE FIRST / BIS · INDIA annotations. Placed as a
+ * single composed block; position / crop / bleed via `className`.
  */
 export function Figurine({
   className,
@@ -265,7 +265,7 @@ export function Figurine({
 }) {
   return (
     <img
-      src="/lion-capital.png"
+      src="/hero-lion.png"
       alt=""
       aria-hidden
       draggable={false}
@@ -277,6 +277,77 @@ export function Figurine({
 
 /* Back-compat alias. */
 export const LionCapitalMark = Figurine;
+
+/* ------------------------------------------------------------------- Motif --- */
+
+/**
+ * A blue-duotone illustration fragment from the reference plate set (lotus,
+ * chhatri dome, carved pillar, fingerprint, mountains, botanical). Feathered
+ * edges, so it dissolves into the paper. Used as editorial section artwork —
+ * one per surface, cropped and bled, never inside a card.
+ */
+type MotifName =
+  | "lotus"
+  | "dome"
+  | "pillar"
+  | "fingerprint"
+  | "mountain"
+  | "botanical";
+
+export function Motif({
+  name,
+  className,
+  style,
+}: {
+  name: MotifName;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return (
+    <img
+      src={`/motif-${name}.png`}
+      alt=""
+      aria-hidden
+      draggable={false}
+      className={cn("pointer-events-none select-none object-contain", className)}
+      style={style}
+    />
+  );
+}
+
+/**
+ * A section-header artwork block: a blue-duotone motif bleeding off the right
+ * edge in the header's whitespace, over a faint grid, with a small mono label
+ * and a corner bracket. Drop it as the first child of a `relative` wrapper
+ * around a <PageHeader>. Hidden below md so it never crowds small screens.
+ */
+export function HeaderMotif({
+  name,
+  label,
+  width = "w-[26%]",
+}: {
+  name: MotifName;
+  label: string;
+  width?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute -top-6 right-0 hidden h-[150%] overflow-hidden md:block",
+        width,
+      )}
+      aria-hidden
+    >
+      <BlueprintField fade="bottom" />
+      <Motif
+        name={name}
+        className="absolute -right-4 top-0 h-[86%] w-auto max-w-none opacity-90"
+      />
+      <Bracket tone="line" className="inset-4" />
+      <span className="annotation absolute bottom-3 left-3">{label}</span>
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------ PhotoFragment --- */
 

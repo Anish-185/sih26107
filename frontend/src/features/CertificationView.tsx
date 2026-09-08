@@ -8,7 +8,12 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui";
-import { Annotation, BlueprintField, Bracket } from "@/components/decor";
+import {
+  Annotation,
+  BlueprintField,
+  Bracket,
+  HeaderMotif,
+} from "@/components/decor";
 import { GroundedAnswer } from "@/components/GroundedAnswer";
 import { ErrorNote } from "@/features/StandardsView";
 
@@ -31,12 +36,14 @@ export function CertificationView() {
 
   return (
     <div className="space-y-12">
-      <PageHeader
-        eyebrow="Certification guidance"
-        title="BIS certification, grounded in evidence"
-        lead="MetrIQ retrieves certification evidence from the BIS knowledge base and asks the local model to explain only that evidence. When the knowledge base does not support an answer it abstains — it does not decide the legal requirement."
-        annotation={<Annotation lead="right">Grounded · abstains when unsupported</Annotation>}
-      />
+      <div className="relative">
+        <HeaderMotif name="fingerprint" label="Verified source" />
+        <PageHeader
+          eyebrow="Certification guidance"
+          title="BIS certification, grounded in evidence"
+          lead="MetrIQ retrieves certification evidence from the BIS knowledge base and asks the local model to explain only that evidence. When the knowledge base does not support an answer it abstains — it does not decide the legal requirement."
+        />
+      </div>
 
       <div className="relative border border-line bg-raised">
         <Bracket tone="accent" />

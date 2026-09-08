@@ -12,7 +12,7 @@ import {
   Annotation,
   BlueprintField,
   Bracket,
-  PhotoFragment,
+  HeaderMotif,
 } from "@/components/decor";
 import { GroundedAnswer } from "@/components/GroundedAnswer";
 import { ErrorNote } from "@/features/StandardsView";
@@ -46,19 +46,7 @@ export function HallmarkingView() {
   return (
     <div className="space-y-12">
       <div className="relative">
-        {/* Lion Capital detail — an Indian-institutional fragment bleeding off
-            the right edge, in the header's whitespace. */}
-        <div className="pointer-events-none absolute -right-5 top-0 hidden h-[124%] w-[32%] overflow-hidden sm:-right-8 md:block">
-          <BlueprintField fade="bottom" />
-          <PhotoFragment
-            src="/lion-capital-detail.png"
-            className="absolute -right-8 top-2 w-[120%] max-w-none object-cover object-left opacity-95"
-          />
-          <Bracket tone="line" className="inset-4" />
-          <Annotation className="absolute bottom-2 left-2">
-            Hallmark · Gold · HUID
-          </Annotation>
-        </div>
+        <HeaderMotif name="dome" label="Heritage · craft" width="w-[24%]" />
         <PageHeader
           eyebrow="Hallmarking / HUID"
           title="Hallmarking & HUID information"

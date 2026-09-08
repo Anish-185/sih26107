@@ -23,6 +23,7 @@ import {
   Annotation,
   BlueprintField,
   Bracket,
+  Motif,
   PhotoFragment,
   Ticks,
 } from "@/components/decor";
@@ -120,14 +121,18 @@ export function InspectionView() {
             Place evidence
           </Annotation>
           <div className="relative overflow-hidden border border-line-strong bg-surface">
-            <BlueprintField fade="radial" />
-            <PhotoFragment
-              src="/blue-botanical.png"
-              className="absolute inset-y-0 left-0 hidden w-12 object-cover object-[8%_45%] opacity-40 md:block lg:w-20"
+            <BlueprintField fade="radial" variant="dots" />
+            <Motif
+              name="fingerprint"
+              className="absolute left-1/2 top-1/2 h-[130%] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.08]"
             />
             <PhotoFragment
               src="/blue-botanical.png"
-              className="absolute inset-y-0 right-0 hidden w-12 scale-x-[-1] object-cover object-[8%_45%] opacity-40 md:block lg:w-20"
+              className="absolute inset-y-0 left-0 hidden w-12 object-cover object-[8%_45%] opacity-30 md:block lg:w-16"
+            />
+            <PhotoFragment
+              src="/blue-botanical.png"
+              className="absolute inset-y-0 right-0 hidden w-12 scale-x-[-1] object-cover object-[8%_45%] opacity-30 md:block lg:w-16"
             />
             <Ticks edge="top" count={13} className="opacity-60" />
             <Ticks edge="bottom" count={13} className="opacity-60" />

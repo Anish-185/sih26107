@@ -13,6 +13,7 @@ import {
   Annotation,
   BlueprintField,
   Bracket,
+  HeaderMotif,
   PhotoFragment,
 } from "@/components/decor";
 import { GroundedAnswer } from "@/components/GroundedAnswer";
@@ -40,12 +41,14 @@ export function LaboratoriesView() {
 
   return (
     <div className="space-y-12">
-      <PageHeader
-        eyebrow="Laboratory search"
-        title="BIS-recognized testing laboratories"
-        lead="MetrIQ does not hold individual laboratory records. It points to BIS's official recognised / empanelled-laboratory lists and the LIMS portal, and abstains rather than fabricate laboratory data."
-        annotation={<Annotation lead="right">Directories · not lab records</Annotation>}
-      />
+      <div className="relative">
+        <HeaderMotif name="pillar" label="Measurement" width="w-[22%]" />
+        <PageHeader
+          eyebrow="Laboratory search"
+          title="BIS-recognized testing laboratories"
+          lead="MetrIQ does not hold individual laboratory records. It points to BIS's official recognised / empanelled-laboratory lists and the LIMS portal, and abstains rather than fabricate laboratory data."
+        />
+      </div>
 
       <Callout>
         This search returns BIS's official laboratory <em>directories</em> and the
