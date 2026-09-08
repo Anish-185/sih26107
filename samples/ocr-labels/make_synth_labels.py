@@ -1,6 +1,8 @@
-"""Generate synthetic Indian legal-metrology declaration labels for OCR checks.
+"""Generate synthetic Indian legal-metrology declaration labels for OCR / pipeline
+checks.
 
-All company / address / licence details are fictional. Output -> this folder.
+All company / address / licence / registration details are fictional. The
+products and Indian Standards are real categories. Output -> this folder.
 """
 from __future__ import annotations
 
@@ -11,8 +13,10 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 SANS = "/usr/share/fonts/liberation/LiberationSans-Regular.ttf"
 SANS_B = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
 
-# The ground-truth declaration (fictional).
-LINES = [
+# (text, font size, bold). "" is a vertical gap.
+Line = tuple[str, int, bool]
+
+CHANA: list[Line] = [
     ("ROASTED MASALA CHANA", 54, True),
     ("(Roasted Bengal gram with spices)", 30, False),
     ("", 18, False),
@@ -29,16 +33,58 @@ LINES = [
     ("FSSAI Lic. No. 10012345000123", 26, False),
 ]
 
+LED_LAMP: list[Line] = [
+    ("LED BULB 9W", 54, True),
+    ("Self-ballasted LED lamp, Cool Daylight 6500K", 28, False),
+    ("Input: 220-240V ~ 50Hz   Base: B22", 26, False),
+    ("", 14, False),
+    ("Net Quantity: 1 N", 40, True),
+    ("M.R.P. Rs. 199.00  (inclusive of all taxes)", 34, True),
+    ("", 12, False),
+    ("Marketed by: LUMENGLOW ELECTRICALS PVT LTD", 28, False),
+    ("Plot 27, Sector 8, IMT Manesar, Gurugram 122051, Haryana", 24, False),
+    ("Mfg Date: 04/2026        Batch No: LG-2604-A", 26, False),
+    ("Warranty: 24 months from date of purchase", 26, False),
+    ("", 12, False),
+    ("BIS CRS Reg. No. R-41000000", 24, False),
+    ("Consumer Care: support@lumenglow.example", 24, False),
+    ("Toll Free 1800-200-4545", 24, False),
+]
 
-def render_base() -> Image.Image:
-    W, H = 1000, 1150
+ELECTRIC_KETTLE: list[Line] = [
+    ("ELECTRIC KETTLE 1.5 L", 52, True),
+    ("Model EK-15S  |  Stainless steel body", 28, False),
+    ("Rated: 220-240V ~ 50Hz   1500 W", 26, False),
+    ("", 14, False),
+    ("Net Quantity: 1 N", 40, True),
+    ("M.R.P. Rs. 899.00  (inclusive of all taxes)", 34, True),
+    ("", 12, False),
+    ("Manufactured by: THERMOPOT APPLIANCES PVT LTD", 26, False),
+    ("Survey 112, Baddi Industrial Area, Solan 173205, Himachal Pradesh", 22, False),
+    ("Mfg Date: 02/2026        Batch No: TP-0226-K", 26, False),
+    ("Warranty: 1 year on product, 2 years on element", 24, False),
+    ("", 12, False),
+    ("ISI Marked   CM/L-1234567", 24, False),
+    ("Consumer Care: care@thermopot.example", 24, False),
+    ("Toll Free 1800-300-7788", 24, False),
+]
+
+PRODUCTS: dict[str, list[Line]] = {
+    "chana": CHANA,
+    "led-lamp": LED_LAMP,
+    "electric-kettle": ELECTRIC_KETTLE,
+}
+
+
+def render_base(lines: list[Line], height: int = 1150) -> Image.Image:
+    W, H = 1000, height
     img = Image.new("RGB", (W, H), "#ece8dc")
     d = ImageDraw.Draw(img)
     d.rectangle([24, 24, W - 24, H - 24], outline="#1a1a1a", width=4)
     d.text((60, 44), "PRINCIPAL DISPLAY PANEL", font=ImageFont.truetype(SANS_B, 24),
            fill="#1a1a1a")
     y = 110
-    for text, size, bold in LINES:
+    for text, size, bold in lines:
         if not text:
             y += size
             continue
@@ -56,24 +102,26 @@ def save(img: Image.Image, name: str, **kw) -> None:
 
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
-    base = render_base()
 
-    # 1 — clean, straight scan
-    save(base, "synth_clean-declaration.png", format="PNG")
+    # The chana label doubles as the clean / angled / low-light OCR test set.
+    chana = render_base(CHANA)
+    save(chana, "synth_clean-declaration.png", format="PNG")
 
-    # 2 — phone-photo-ish: slight rotation, mild blur, warm cast, JPEG
-    photo = base.rotate(-3.5, expand=True, fillcolor="#e9e7de", resample=Image.BICUBIC)
+    photo = chana.rotate(-3.5, expand=True, fillcolor="#e9e7de", resample=Image.BICUBIC)
     photo = photo.filter(ImageFilter.GaussianBlur(1.1))
     photo = ImageEnhance.Contrast(photo).enhance(0.92)
     photo = ImageEnhance.Color(photo).enhance(1.15)
     save(photo, "synth_photo-angled.jpg", format="JPEG", quality=72)
 
-    # 3 — low-light + out of focus: should trip the quality "low quality" notes
-    dim = ImageEnhance.Brightness(base).enhance(0.45)
+    dim = ImageEnhance.Brightness(chana).enhance(0.45)
     dim = ImageEnhance.Contrast(dim).enhance(0.70)
     dim = dim.filter(ImageFilter.GaussianBlur(2.4))
     dim = dim.rotate(1.5, expand=True, fillcolor="#20201c", resample=Image.BICUBIC)
     save(dim, "synth_low-light-blurry.jpg", format="JPEG", quality=55)
+
+    # One clean declaration panel per additional product.
+    save(render_base(LED_LAMP), "synth_led-lamp.png", format="PNG")
+    save(render_base(ELECTRIC_KETTLE), "synth_electric-kettle.png", format="PNG")
 
 
 if __name__ == "__main__":

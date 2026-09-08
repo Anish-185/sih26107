@@ -1,22 +1,25 @@
-# OCR sample images — MetrIQ `/inspection/analyze` model check
+# OCR sample images — MetrIQ `/inspection/analyze`
 
 Drop these into the **Inspection** tab (or `curl -F image=@<file> http://127.0.0.1:8000/inspection/analyze`)
-to sanity-check the local OCR pipeline (`rapidocr-onnxruntime`, PP-OCRv3 weights).
+to exercise the pipeline: local OCR (`rapidocr-onnxruntime`, PP-OCRv3 weights) →
+declaration extraction → product classification → verified Indian Standard lookup.
 
 Nothing here is production data. The `synth_*` labels are generated locally by
 `make_synth_labels.py` (in this folder) with **fictional** company / address /
-FSSAI / batch details — they exist only to give OCR a known ground truth. Regen:
-`../../backend/.venv/bin/python make_synth_labels.py`.
+licence / registration details — the products and Indian Standards are real
+categories. Regen: `../../backend/.venv/bin/python make_synth_labels.py`.
 
 ## Synthetic — known ground truth (use these for pass/fail checks)
 
-| File | What it tests | Expected |
+| File | What it tests | Expected pipeline outcome |
 |---|---|---|
-| `synth_clean-declaration.png` | straight, sharp legal-metrology declaration panel | ~13 regions, mean confidence ≈ 0.9, quality **not** low, reads "Net Quantity: 200 g", "M.R.P. Rs. 45.00", "Batch No: SR2026-0342", "Mfg Date: 03/2026", "FSSAI Lic. No. 10012345000123" |
-| `synth_photo-angled.jpg` | ~3.5° rotation + mild blur + JPEG, like a phone photo | same fields recognised; note PP-OCRv3 tends to drop the spaces between words here (`NetQuantity:200g`) — this is the engine, not the pipeline |
-| `synth_low-light-blurry.jpg` | dark, low-contrast, out of focus | quality flagged **low** with notes "Image looks blurred…" + "Low contrast…"; text still mostly recovered but with character errors (`Piot 14`, `Maharashdra`) |
+| `synth_clean-declaration.png` | roasted-chana declaration panel, straight & sharp | ~13 OCR regions; 12 declared fields; classified **Roasted Bengal Gram**; standard **MATCHED → IS 18140:2023** |
+| `synth_photo-angled.jpg` | same label, ~3.5° rotation + blur + JPEG | same result; PP-OCRv3 tends to drop spaces (`NetQuantity:200g`) — engine, not pipeline |
+| `synth_low-light-blurry.jpg` | same label, dark / low-contrast / out of focus | quality flagged **low**; text mostly recovered with character errors; usually still MATCHED |
+| `synth_led-lamp.png` | 9 W self-ballasted LED bulb declaration | classified **Self-Ballasted LED Lamp**; standard **MATCHED → IS 16102 (Part 1):2026**. The `BIS CRS Reg. No.` on the label is a registration, not a standard — MetrIQ does not read the IS number off the label. |
+| `synth_electric-kettle.png` | 1.5 L / 1500 W electric kettle declaration | classified **Electric Kettle**; standard **MATCHED → IS 367:1993** |
 
-Ground-truth declaration text (all three):
+Ground-truth declaration text — chana labels:
 
 ```
 ROASTED MASALA CHANA  (Roasted Bengal gram with spices)
@@ -30,6 +33,14 @@ Consumer Care: care@sunrisefoods.example
 Toll Free 1800-000-1234  (Mon-Sat, 9am-6pm)
 FSSAI Lic. No. 10012345000123
 ```
+
+`synth_led-lamp.png` — LED BULB 9W · Net Quantity 1 N · MRP ₹199.00 · Marketed by
+LUMENGLOW ELECTRICALS PVT LTD, Gurugram 122051 · Mfg 04/2026 · Batch LG-2604-A ·
+BIS CRS Reg. No. R-41000000.
+
+`synth_electric-kettle.png` — ELECTRIC KETTLE 1.5 L · 1500 W · Net Quantity 1 N ·
+MRP ₹899.00 · Manufactured by THERMOPOT APPLIANCES PVT LTD, Solan 173205 ·
+Mfg 02/2026 · Batch TP-0226-K · ISI Marked CM/L-1234567.
 
 ## Real label photos (Wikimedia Commons)
 

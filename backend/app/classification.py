@@ -57,6 +57,14 @@ _RULES: list[tuple[tuple[str, ...], str, str, str]] = [
         ("packaged natural mineral water", "natural mineral water", "mineral water"),
         "Packaged Natural Mineral Water", "food", "water",
     ),
+    (
+        ("self ballasted led lamp", "led lamp", "led bulb", "led light bulb"),
+        "Self-Ballasted LED Lamp", "household", "lighting / LED lamp",
+    ),
+    (
+        ("electric kettle", "cordless kettle", "electric jug"),
+        "Electric Kettle", "household", "electrical appliance / heats liquid",
+    ),
 ]
 
 _CLASSIFY_SYSTEM = """You classify a retail product from the text printed on its

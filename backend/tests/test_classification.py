@@ -87,6 +87,28 @@ def test_deterministic_path_no_model_call() -> None:
     check("chana -> reason cites the matched phrase", "roasted bengal gram" in c.reason.lower())
 
 
+def test_deterministic_rules_for_electrical_products() -> None:
+    led = [
+        Region("OCR-001", "LED BULB 9W", 0.95, [0, 0, 1, 1]),
+        Region("OCR-002", "Self-ballasted LED lamp, Cool Daylight 6500K", 0.9, [0, 2, 1, 3]),
+        Region("OCR-003", "Net Quantity: 1 N", 0.85, [0, 4, 1, 5]),
+    ]
+    c = classify_product(_stage(led), "\n".join(r.text for r in led), llm=None)
+    check("LED bulb -> CLASSIFIED", c.status == "CLASSIFIED", c.status)
+    check("LED bulb -> 'Self-Ballasted LED Lamp'",
+          c.normalized_product == "Self-Ballasted LED Lamp", str(c.normalized_product))
+    check("LED bulb -> deterministic, no model", c.method == "deterministic")
+
+    kettle = [
+        Region("OCR-001", "ELECTRIC KETTLE 1.5 L", 0.95, [0, 0, 1, 1]),
+        Region("OCR-002", "Rated: 220-240V ~ 50Hz 1500 W", 0.9, [0, 2, 1, 3]),
+    ]
+    k = classify_product(_stage(kettle), "\n".join(r.text for r in kettle), llm=None)
+    check("electric kettle -> CLASSIFIED", k.status == "CLASSIFIED", k.status)
+    check("electric kettle -> 'Electric Kettle'",
+          k.normalized_product == "Electric Kettle", str(k.normalized_product))
+
+
 def test_llm_path_strict_json() -> None:
     reply = (
         'Sure. {"product_name": "Glimmer Shine Deluxe", '
@@ -153,6 +175,7 @@ def main() -> int:
     print("product classification")
     for fn in (
         test_deterministic_path_no_model_call,
+        test_deterministic_rules_for_electrical_products,
         test_llm_path_strict_json,
         test_model_cannot_inject_a_standard_number,
         test_model_unavailable_is_review,

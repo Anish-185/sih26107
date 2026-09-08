@@ -38,8 +38,9 @@ def test_registry_is_verified_only() -> None:
     check("every entry has product keywords", all(s.product_keywords for s in reg))
     check("no FSSAI regulation is stored as an Indian Standard",
           all(s.source == "BIS" for s in reg))
-    check("IS 18140:2023 is present",
-          any(s.standard_number == "IS 18140:2023" for s in reg))
+    for number in ("IS 18140:2023", "IS 16102 (Part 1):2026", "IS 367:1993"):
+        check(f"{number} is present",
+              any(s.standard_number == number for s in reg))
 
 
 def test_chana_matches_is_18140() -> None:
@@ -56,8 +57,25 @@ def test_chana_matches_is_18140() -> None:
     check("reason cites the matched keywords", "roasted bengal gram" in m.reason.lower())
 
 
+def test_led_lamp_and_kettle_match_their_standards() -> None:
+    led = lookup_standard("Self-Ballasted LED Lamp", extra_terms="LED BULB 9W")
+    check("LED lamp -> MATCHED", led.status == "MATCHED", led.status)
+    check("LED lamp -> IS 16102 (Part 1):2026",
+          led.standard and led.standard.standard_number == "IS 16102 (Part 1):2026",
+          str(led.standard))
+    check("LED lamp -> matched keywords are unique",
+          len(led.matched_keywords) == len(set(led.matched_keywords)),
+          str(led.matched_keywords))
+
+    kettle = lookup_standard("Electric Kettle", extra_terms="ELECTRIC KETTLE 1.5 L")
+    check("electric kettle -> MATCHED", kettle.status == "MATCHED", kettle.status)
+    check("electric kettle -> IS 367:1993",
+          kettle.standard and kettle.standard.standard_number == "IS 367:1993",
+          str(kettle.standard))
+
+
 def test_unknown_product_is_review_not_a_guess() -> None:
-    for product in ("Ordinary Portland Cement", "LED bulb", "wrist watch", ""):
+    for product in ("Ordinary Portland Cement", "wrist watch", "ceiling fan", ""):
         m = lookup_standard(product)
         check(f"{product!r} -> REVIEW", m.status == "REVIEW", m.status)
         check(f"{product!r} -> no standard invented", m.standard is None)
@@ -83,6 +101,7 @@ def main() -> int:
     for fn in (
         test_registry_is_verified_only,
         test_chana_matches_is_18140,
+        test_led_lamp_and_kettle_match_their_standards,
         test_unknown_product_is_review_not_a_guess,
         test_single_generic_word_does_not_match,
         test_mineral_water_matches_its_own_standard,

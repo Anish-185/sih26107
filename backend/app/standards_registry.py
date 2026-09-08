@@ -130,7 +130,10 @@ def _phrase_present(phrase: str, haystack: str) -> bool:
 
 
 def _score(entry: VerifiedStandard, product_blob: str) -> tuple[float, list[str], int]:
-    matched = [kw for kw in entry.product_keywords if _phrase_present(kw, product_blob)]
+    matched: list[str] = []
+    for kw in entry.product_keywords:
+        if kw not in matched and _phrase_present(kw, product_blob):
+            matched.append(kw)
     if not matched:
         return 0.0, [], 0
     longest_words = max(len(kw.split()) for kw in matched)
