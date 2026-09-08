@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
-import { ApiError, api, type InspectionAnalysis, type OcrRegion } from "@/lib/api";
+import {
+  ApiError,
+  api,
+  type Declaration,
+  type InspectionAnalysis,
+  type OcrRegion,
+} from "@/lib/api";
 import { useAsyncTask } from "@/lib/hooks";
 import { cn } from "@/lib/cn";
 import {
@@ -231,8 +237,23 @@ function Workspace({
   setSelectedRegion: (id: string | null) => void;
   onReset: () => void;
 }) {
-  const { image, quality, ocr } = result;
+  const { image, quality, ocr, declaration_stage, classification, standard_match } =
+    result;
   const region = ocr.regions.find((r) => r.id === selectedRegion) ?? null;
+  const declForRegion = selectedRegion
+    ? declaration_stage.declarations.find(
+        (d) => d.source_region_id === selectedRegion,
+      ) ?? null
+    : null;
+
+  const productLabel =
+    classification.status === "CLASSIFIED" && classification.normalized_product
+      ? classification.normalized_product
+      : "Needs review";
+  const standardLabel =
+    standard_match.status === "MATCHED" && standard_match.standard
+      ? standard_match.standard.number
+      : "Needs review";
 
   return (
     <div className="space-y-6">
@@ -249,11 +270,11 @@ function Workspace({
       </div>
 
       <Callout>
-        <span className="font-medium">OCR is live.</span> The text, boxes and
-        confidence below come from local OCR on your image. Declaration
-        extraction, the applicable Indian Standard and the legal-metrology rule
-        checks are later phases — those fields read “pending”, not placeholder
-        values.
+        <span className="font-medium">Live pipeline.</span> Local OCR, then
+        deterministic declaration extraction, product classification and a
+        lookup against a verified Indian Standards registry. Every value traces
+        back to the OCR region it came from. The legal-metrology PASS/FAIL rule
+        engine is the next phase; unresolved stages read “review”, never a guess.
       </Callout>
 
       {result.notes.length > 0 && (
@@ -299,26 +320,56 @@ function Workspace({
                 <Mono muted>{ocr.duration_ms} ms</Mono>
               </DefinitionRow>
               <DefinitionRow label="Product">
-                <span className="text-ink-faint">Pending extraction</span>
+                <span
+                  className={cn(
+                    classification.status === "CLASSIFIED"
+                      ? "text-ink"
+                      : "text-review",
+                  )}
+                >
+                  {productLabel}
+                </span>
               </DefinitionRow>
               <DefinitionRow label="Standard">
-                <span className="text-ink-faint">Pending extraction</span>
+                <span
+                  className={cn(
+                    standard_match.status === "MATCHED" ? "text-ink" : "text-review",
+                  )}
+                >
+                  {standardLabel}
+                </span>
               </DefinitionRow>
             </dl>
           </Panel>
         </div>
 
-        {/* RIGHT — OCR results */}
+        {/* RIGHT — OCR + pipeline results */}
         <div className="space-y-6">
           <QualityPanel quality={quality} />
+          <DeclarationsPanel
+            stage={declaration_stage}
+            selected={selectedRegion}
+            onSelect={setSelectedRegion}
+          />
+          <StandardPanel
+            match={standard_match}
+            classification={classification}
+          />
           <RegionsPanel
             regions={ocr.regions}
             selected={selectedRegion}
             onSelect={setSelectedRegion}
           />
-          {region && <RegionDetail region={region} imageW={image.width} imageH={image.height} />}
+          {region && (
+            <RegionDetail
+              region={region}
+              declaration={declForRegion}
+              imageW={image.width}
+              imageH={image.height}
+            />
+          )}
           <RawTextPanel text={ocr.text} />
-          <PendingPanel />
+          <DownstreamPanel result={result} />
         </div>
       </div>
     </div>
@@ -424,10 +475,12 @@ function RegionsPanel({
 
 function RegionDetail({
   region,
+  declaration,
   imageW,
   imageH,
 }: {
   region: OcrRegion;
+  declaration: Declaration | null;
   imageW: number;
   imageH: number;
 }) {
@@ -453,11 +506,250 @@ function RegionDetail({
           </Mono>
         </DefinitionRow>
         <DefinitionRow label="Interpretation">
-          <span className="text-ink-faint">
-            Not classified yet — declaration extraction is a later phase.
-          </span>
+          {declaration ? (
+            <span className="text-ink">
+              <span className="font-medium">{declaration.label}:</span>{" "}
+              {declaration.value}
+              <Mono muted className="mt-0.5 block text-[10px] uppercase tracking-[0.1em]">
+                {declaration.method} · extracted declaration
+              </Mono>
+            </span>
+          ) : (
+            <span className="text-ink-faint">
+              Not part of an extracted declaration.
+            </span>
+          )}
         </DefinitionRow>
       </dl>
+    </Panel>
+  );
+}
+
+/* -- pipeline panels -------------------------------------------------- */
+
+function stageTone(status: string): string {
+  switch (status) {
+    case "COMPLETED":
+    case "CLASSIFIED":
+    case "MATCHED":
+      return "text-accent";
+    case "PARTIAL":
+    case "REVIEW":
+      return "text-review";
+    case "NEXT":
+      return "text-ink-soft";
+    default:
+      return "text-ink-faint";
+  }
+}
+
+function methodTone(method: Declaration["method"]): string {
+  return method === "heuristic" ? "text-ink-faint" : "text-ink-soft";
+}
+
+function DeclarationsPanel({
+  stage,
+  selected,
+  onSelect,
+}: {
+  stage: InspectionAnalysis["declaration_stage"];
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  return (
+    <Panel flush>
+      <PanelHeader
+        title="Declared fields"
+        meta={
+          <span className={stageTone(stage.status)}>
+            {stage.status}
+            {stage.principal_display_panel ? " · PDP" : ""}
+          </span>
+        }
+      />
+      {stage.declarations.length === 0 ? (
+        <p className="px-5 py-4 text-[13px] text-ink-soft">
+          No declaration fields could be read from the OCR text. This inspection
+          needs officer review — no values are shown.
+        </p>
+      ) : (
+        <ul>
+          {stage.declarations.map((d, i) => {
+            const active = d.source_region_id === selected && selected !== null;
+            return (
+              <li key={d.field}>
+                <button
+                  type="button"
+                  onMouseEnter={() =>
+                    d.source_region_id && onSelect(d.source_region_id)
+                  }
+                  onFocus={() =>
+                    d.source_region_id && onSelect(d.source_region_id)
+                  }
+                  onClick={() =>
+                    onSelect(active ? null : d.source_region_id ?? null)
+                  }
+                  className={cn(
+                    "flex w-full items-start justify-between gap-4 px-5 py-3 text-left transition-colors",
+                    i > 0 && "border-t border-line",
+                    active ? "bg-accent-soft" : "hover:bg-surface",
+                  )}
+                >
+                  <div className="min-w-0">
+                    <div className="kicker">{d.label}</div>
+                    <div className="mt-1 text-[13px] font-medium text-ink">
+                      {d.value}
+                      {d.unit && d.unit !== "INR" ? (
+                        <span className="text-ink-faint"> {d.unit}</span>
+                      ) : null}
+                    </div>
+                    <Mono muted className="mt-0.5 block text-[10px]">
+                      {d.source_region_id ?? "—"} ·{" "}
+                      <span className={methodTone(d.method)}>{d.method}</span>
+                      {" · OCR "}
+                      {Math.round(d.ocr_confidence * 100)}%
+                    </Mono>
+                  </div>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {stage.missing_fields.length > 0 && (
+        <p className="border-t border-line px-5 py-3 text-[11px] text-ink-faint">
+          Not found on this panel: {stage.missing_fields.join(", ")}
+        </p>
+      )}
+    </Panel>
+  );
+}
+
+function StandardPanel({
+  match,
+  classification,
+}: {
+  match: InspectionAnalysis["standard_match"];
+  classification: InspectionAnalysis["classification"];
+}) {
+  const matched = match.status === "MATCHED" && match.standard;
+
+  return (
+    <Panel flush>
+      <PanelHeader
+        title="Applicable Indian Standard"
+        meta={
+          <span className={stageTone(match.status)}>{match.status}</span>
+        }
+      />
+      {matched ? (
+        <dl className="px-5 py-2">
+          <DefinitionRow label="Standard">
+            <Mono className="text-[13px] font-semibold text-ink">
+              {match.standard!.number}
+            </Mono>
+          </DefinitionRow>
+          <DefinitionRow label="Title">
+            <span className="text-ink">{match.standard!.title}</span>
+          </DefinitionRow>
+          <DefinitionRow label="Source">
+            <a
+              href={match.standard!.source_url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"
+            >
+              {match.standard!.source}
+            </a>
+            {match.standard!.reference ? (
+              <Mono muted className="mt-0.5 block text-[10px]">
+                {match.standard!.reference}
+              </Mono>
+            ) : null}
+          </DefinitionRow>
+          <DefinitionRow label="Confidence">
+            <Mono>{Math.round(match.confidence * 100)}%</Mono>
+          </DefinitionRow>
+          <DefinitionRow label="Normalized product">
+            <span className="text-ink">{classification.normalized_product}</span>
+            <Mono muted className="mt-0.5 block text-[10px] uppercase tracking-[0.1em]">
+              {classification.method} · {Math.round(classification.confidence * 100)}%
+            </Mono>
+          </DefinitionRow>
+          <DefinitionRow label="Why this match">
+            <span className="text-ink-soft">{match.reason}</span>
+          </DefinitionRow>
+        </dl>
+      ) : (
+        <div className="px-5 py-4">
+          <p className="text-[13px] text-review">
+            No verified Indian Standard was matched with enough confidence — sent
+            for officer review.
+          </p>
+          <p className="mt-2 text-[12px] text-ink-faint">
+            {match.reason || classification.reason}
+          </p>
+          <p className="mt-2 text-[11px] text-ink-faint">
+            MetrIQ only cites standards from its verified registry. It never
+            generates an IS number.
+          </p>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+function DownstreamPanel({ result }: { result: InspectionAnalysis }) {
+  const p = result.pipeline;
+  const rows: [string, string, string][] = [
+    ["OCR", "Local PaddleOCR text detection", p.ocr],
+    [
+      "Declaration extraction",
+      "Deterministic parse of OCR text into declared fields",
+      p.declaration_extraction,
+    ],
+    [
+      "Product classification",
+      result.classification.method === "llm"
+        ? "Local Qwen3-4B, strict JSON"
+        : "Deterministic product rules",
+      p.product_classification,
+    ],
+    [
+      "Indian Standard lookup",
+      "Verified standards registry — never generated",
+      p.standard_lookup,
+    ],
+    ["Legal-metrology rules", "Deterministic PASS / FAIL / REVIEW engine", p.legal_metrology],
+    ["Officer review & report", "Human verification, PDF report, history", p.officer_review],
+  ];
+  return (
+    <Panel flush>
+      <PanelHeader title="Downstream pipeline" meta="OCR → standard live" />
+      <ul>
+        {rows.map(([k, v, status], i) => (
+          <li
+            key={k}
+            className={cn(
+              "flex items-baseline justify-between gap-4 px-5 py-3",
+              i > 0 && "border-t border-line",
+            )}
+          >
+            <div>
+              <div className="text-[13px] font-medium text-ink-soft">{k}</div>
+              <div className="text-[12px] text-ink-faint">{v}</div>
+            </div>
+            <Mono
+              className={cn(
+                "shrink-0 text-[10px] uppercase tracking-[0.1em]",
+                stageTone(status),
+              )}
+            >
+              {status}
+            </Mono>
+          </li>
+        ))}
+      </ul>
     </Panel>
   );
 }
@@ -473,35 +765,3 @@ function RawTextPanel({ text }: { text: string }) {
   );
 }
 
-function PendingPanel() {
-  const rows = [
-    ["Declaration extraction", "Deterministic parse of OCR text into declared fields"],
-    ["Product → Standard", "Applicability engine + /product-standard lookup"],
-    ["Legal-metrology rules", "Deterministic rule engine — PASS / FAIL / REVIEW"],
-    ["Officer review & report", "Human verification, PDF report, history"],
-  ];
-  return (
-    <Panel flush>
-      <PanelHeader title="Downstream pipeline" meta="not in this phase" />
-      <ul>
-        {rows.map(([k, v], i) => (
-          <li
-            key={k}
-            className={cn(
-              "flex items-baseline justify-between gap-4 px-5 py-3",
-              i > 0 && "border-t border-line",
-            )}
-          >
-            <div>
-              <div className="text-[13px] font-medium text-ink-soft">{k}</div>
-              <div className="text-[12px] text-ink-faint">{v}</div>
-            </div>
-            <Mono muted className="shrink-0 text-[10px] uppercase tracking-[0.1em]">
-              Pending
-            </Mono>
-          </li>
-        ))}
-      </ul>
-    </Panel>
-  );
-}

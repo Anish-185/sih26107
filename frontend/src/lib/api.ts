@@ -184,6 +184,69 @@ export interface OcrRegion {
   polygon: number[][]; // [[x,y] x4]
 }
 
+/** One structured declaration read off the label, with its OCR evidence. */
+export interface Declaration {
+  field: string;
+  label: string;
+  value: string;
+  unit: string | null;
+  numeric_value: number | null;
+  raw_text: string;
+  source_region_id: string | null;
+  bbox: [number, number, number, number] | null;
+  ocr_confidence: number;
+  method: "regex" | "keyword" | "heuristic";
+  note: string;
+}
+
+export interface DeclarationStage {
+  status: "COMPLETED" | "PARTIAL" | "REVIEW";
+  declarations: Declaration[];
+  principal_display_panel: boolean;
+  found_fields: string[];
+  missing_fields: string[];
+  notes: string[];
+}
+
+export interface ProductClassification {
+  status: "CLASSIFIED" | "REVIEW";
+  product_name: string | null;
+  normalized_product: string | null;
+  category: string | null;
+  subcategory: string | null;
+  confidence: number;
+  method: "deterministic" | "llm";
+  reason: string;
+  source_declarations: string[];
+}
+
+export interface VerifiedStandard {
+  number: string;
+  title: string;
+  source: string;
+  source_url: string;
+  reference: string;
+  status: string;
+}
+
+export interface StandardMatch {
+  status: "MATCHED" | "REVIEW";
+  normalized_product: string | null;
+  standard: VerifiedStandard | null;
+  confidence: number;
+  matched_keywords: string[];
+  reason: string;
+}
+
+export interface PipelineStages {
+  ocr: string;
+  declaration_extraction: string;
+  product_classification: string;
+  standard_lookup: string;
+  legal_metrology: string;
+  officer_review: string;
+}
+
 export interface InspectionAnalysis {
   inspection_id: string;
   created_at: string;
@@ -209,12 +272,11 @@ export interface InspectionAnalysis {
     duration_ms: number;
     regions: OcrRegion[];
   };
-  // Downstream phases — not implemented yet, returned explicitly empty/pending.
-  product: string;
-  declarations: unknown[];
-  checks: unknown[];
-  status: string;
-  pipeline_stage: string;
+  // Phase 14 — real downstream pipeline.
+  declaration_stage: DeclarationStage;
+  classification: ProductClassification;
+  standard_match: StandardMatch;
+  pipeline: PipelineStages;
   notes: string[];
 }
 

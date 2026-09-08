@@ -1,7 +1,9 @@
 """HTTP layer for the inspection pipeline.
 
     POST /inspection/analyze   multipart/form-data, field "image"
-      -> InspectionAnalysisOut   (image info + quality + raw OCR regions)
+      -> InspectionAnalysisOut
+         (image info + quality + raw OCR regions + declarations
+          + product classification + verified Indian Standard match)
 """
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ from app.inspection import (
     InspectionAnalysisOut,
     InspectionAnalyzer,
 )
+from app.llm import LocalLLM
 from app.ocr import OcrError
 
 router = APIRouter(prefix="/inspection", tags=["inspection"])
@@ -23,7 +26,10 @@ router = APIRouter(prefix="/inspection", tags=["inspection"])
 
 @lru_cache(maxsize=1)
 def get_analyzer() -> InspectionAnalyzer:
-    return InspectionAnalyzer()
+    # A short timeout: product classification only calls the model when the
+    # deterministic rules miss, and the analyze request must stay responsive.
+    # If LM Studio is down the pipeline falls back to REVIEW, it does not error.
+    return InspectionAnalyzer(llm=LocalLLM(timeout=45.0))
 
 
 @router.post("/analyze", response_model=InspectionAnalysisOut)

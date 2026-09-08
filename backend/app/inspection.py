@@ -1,10 +1,13 @@
-"""Inspection analysis — the IMAGE -> OCR step of the MetrIQ pipeline.
+"""Inspection analysis — IMAGE -> OCR -> declarations -> product -> standard.
 
-Scope of this phase: decode the uploaded package image, run lightweight quality
-checks, run local OCR, and return the raw OCR regions. Nothing here extracts
-declarations, applies legal rules, or produces a PASS/FAIL — those are separate
-downstream phases and their fields are returned as ``"Pending extraction"`` /
-empty, never invented.
+This module decodes the uploaded package image, runs lightweight quality checks
+and local OCR (unchanged from Phase 13), then runs the downstream pipeline
+(``app.pipeline``): deterministic declaration extraction, product classification
+(deterministic, else local Qwen3-4B), and a verified Indian Standard lookup.
+
+Legal-metrology PASS/FAIL is still a later phase and is reported as ``NEXT``.
+Nothing here is fabricated: a stage that cannot produce a reliable result reports
+``REVIEW``.
 """
 
 from __future__ import annotations
@@ -17,7 +20,9 @@ import numpy as np
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field
 
+from app.llm import LocalLLM
 from app.ocr import OCR_ENGINE, OcrError, run_ocr
+from app.pipeline import run_downstream
 
 # Guard rails for a demo backend on a laptop.
 MAX_BYTES = 20 * 1024 * 1024          # 20 MB upload cap
@@ -75,18 +80,79 @@ class OcrOut(BaseModel):
     regions: list[OcrRegionOut]
 
 
+class DeclarationOut(BaseModel):
+    field: str
+    label: str
+    value: str
+    unit: str | None = None
+    numeric_value: float | None = None
+    raw_text: str
+    source_region_id: str | None = None
+    bbox: list[int] | None = None
+    ocr_confidence: float
+    method: str = Field(description='"regex" | "keyword" | "heuristic"')
+    note: str = ""
+
+
+class DeclarationStageOut(BaseModel):
+    status: str = Field(description='"COMPLETED" | "PARTIAL" | "REVIEW"')
+    declarations: list[DeclarationOut]
+    principal_display_panel: bool
+    found_fields: list[str]
+    missing_fields: list[str]
+    notes: list[str] = Field(default_factory=list)
+
+
+class ClassificationOut(BaseModel):
+    status: str = Field(description='"CLASSIFIED" | "REVIEW"')
+    product_name: str | None = None
+    normalized_product: str | None = None
+    category: str | None = None
+    subcategory: str | None = None
+    confidence: float
+    method: str = Field(description='"deterministic" | "llm"')
+    reason: str
+    source_declarations: list[str] = Field(default_factory=list)
+
+
+class StandardOut(BaseModel):
+    number: str
+    title: str
+    source: str
+    source_url: str
+    reference: str = ""
+    status: str = "verified"
+
+
+class StandardMatchOut(BaseModel):
+    status: str = Field(description='"MATCHED" | "REVIEW"')
+    normalized_product: str | None = None
+    standard: StandardOut | None = None
+    confidence: float
+    matched_keywords: list[str] = Field(default_factory=list)
+    reason: str = ""
+
+
+class PipelineStagesOut(BaseModel):
+    ocr: str
+    declaration_extraction: str
+    product_classification: str
+    standard_lookup: str
+    legal_metrology: str = "NEXT"
+    officer_review: str = "PENDING"
+
+
 class InspectionAnalysisOut(BaseModel):
     inspection_id: str
     created_at: str
     image: ImageInfoOut
     quality: QualityOut
     ocr: OcrOut
-    # Downstream phases — explicitly not done yet.
-    product: str = "Pending extraction"
-    declarations: list[dict] = Field(default_factory=list)
-    checks: list[dict] = Field(default_factory=list)
-    status: str = "PENDING"
-    pipeline_stage: str = "ocr"
+    # Phase 14 — real downstream pipeline.
+    declaration_stage: DeclarationStageOut
+    classification: ClassificationOut
+    standard_match: StandardMatchOut
+    pipeline: PipelineStagesOut
     notes: list[str] = Field(default_factory=list)
 
 
@@ -95,7 +161,15 @@ class InspectionAnalysisOut(BaseModel):
 # ---------------------------------------------------------------------------
 
 class InspectionAnalyzer:
-    """Decode -> quality -> OCR. Stateless; safe to reuse."""
+    """Decode -> quality -> OCR -> declarations -> product -> standard.
+
+    Stateless; safe to reuse. ``llm`` is optional: when it is ``None`` (or the
+    server is unreachable) the pipeline uses deterministic classification only
+    and degrades unresolved stages to ``REVIEW``.
+    """
+
+    def __init__(self, llm: LocalLLM | None = None) -> None:
+        self._llm = llm
 
     def analyze(self, data: bytes, filename: str) -> InspectionAnalysisOut:
         if not data:
@@ -159,6 +233,23 @@ class InspectionAnalyzer:
             )
         notes.extend(quality.notes)
 
+        # ---- downstream pipeline (declarations -> product -> standard) ----
+        # Isolated so a pipeline bug can never break the OCR response.
+        try:
+            downstream = run_downstream(regions, joined, self._llm)
+            declaration_stage, classification, standard_match, pipeline = (
+                _declaration_stage_out(downstream.declaration_stage),
+                _classification_out(downstream.classification),
+                _standard_match_out(downstream.standard_match),
+                _pipeline_out(downstream.stages),
+            )
+            notes.extend(downstream.notes)
+        except Exception as exc:  # noqa: BLE001
+            declaration_stage, classification, standard_match, pipeline = _all_review(
+                f"Downstream pipeline error: {exc}"
+            )
+            notes.append(f"Downstream pipeline error: {exc}")
+
         return InspectionAnalysisOut(
             inspection_id=f"INS-{datetime.now(timezone.utc):%Y%m%d}-{uuid.uuid4().hex[:6].upper()}",
             created_at=datetime.now(timezone.utc).isoformat(),
@@ -178,6 +269,10 @@ class InspectionAnalyzer:
                 duration_ms=int(elapsed * 1000),
                 regions=regions,
             ),
+            declaration_stage=declaration_stage,
+            classification=classification,
+            standard_match=standard_match,
+            pipeline=pipeline,
             notes=notes,
         )
 
@@ -250,3 +345,106 @@ class InspectionAnalyzer:
         new_size = (max(1, int(w * scale)), max(1, int(h * scale)))
         resized = Image.fromarray(arr).resize(new_size, Image.LANCZOS)
         return np.asarray(resized, dtype=np.uint8), scale
+
+
+# ---------------------------------------------------------------------------
+# dataclass (app.pipeline) -> pydantic (*Out) converters
+# ---------------------------------------------------------------------------
+
+def _declaration_stage_out(stage) -> DeclarationStageOut:
+    return DeclarationStageOut(
+        status=stage.status,
+        declarations=[
+            DeclarationOut(
+                field=d.field,
+                label=d.label,
+                value=d.value,
+                unit=d.unit,
+                numeric_value=d.numeric_value,
+                raw_text=d.raw_text,
+                source_region_id=d.source_region_id,
+                bbox=d.bbox,
+                ocr_confidence=d.ocr_confidence,
+                method=d.method,
+                note=d.note,
+            )
+            for d in stage.declarations
+        ],
+        principal_display_panel=stage.principal_display_panel,
+        found_fields=list(stage.found_fields),
+        missing_fields=list(stage.missing_fields),
+        notes=list(stage.notes),
+    )
+
+
+def _classification_out(cls) -> ClassificationOut:
+    return ClassificationOut(
+        status=cls.status,
+        product_name=cls.product_name,
+        normalized_product=cls.normalized_product,
+        category=cls.category,
+        subcategory=cls.subcategory,
+        confidence=cls.confidence,
+        method=cls.method,
+        reason=cls.reason,
+        source_declarations=list(cls.source_declarations),
+    )
+
+
+def _standard_match_out(match) -> StandardMatchOut:
+    std = None
+    if match.standard is not None:
+        std = StandardOut(
+            number=match.standard.standard_number,
+            title=match.standard.title,
+            source=match.standard.source,
+            source_url=match.standard.source_url,
+            reference=match.standard.reference,
+            status=match.standard.status,
+        )
+    return StandardMatchOut(
+        status=match.status,
+        normalized_product=match.normalized_product or None,
+        standard=std,
+        confidence=match.confidence,
+        matched_keywords=list(match.matched_keywords),
+        reason=match.reason,
+    )
+
+
+def _pipeline_out(stages) -> PipelineStagesOut:
+    return PipelineStagesOut(
+        ocr=stages.ocr,
+        declaration_extraction=stages.declaration_extraction,
+        product_classification=stages.product_classification,
+        standard_lookup=stages.standard_lookup,
+        legal_metrology=stages.legal_metrology,
+        officer_review=stages.officer_review,
+    )
+
+
+def _all_review(note: str):
+    """Fallback quartet when the whole downstream pipeline raised."""
+    return (
+        DeclarationStageOut(
+            status="REVIEW",
+            declarations=[],
+            principal_display_panel=False,
+            found_fields=[],
+            missing_fields=[],
+            notes=[note],
+        ),
+        ClassificationOut(
+            status="REVIEW",
+            confidence=0.0,
+            method="deterministic",
+            reason=note,
+        ),
+        StandardMatchOut(status="REVIEW", confidence=0.0, reason=note),
+        PipelineStagesOut(
+            ocr="COMPLETED",
+            declaration_extraction="REVIEW",
+            product_classification="REVIEW",
+            standard_lookup="REVIEW",
+        ),
+    )

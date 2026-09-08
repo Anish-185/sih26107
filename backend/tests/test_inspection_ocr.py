@@ -111,9 +111,22 @@ def test_no_text_returns_empty_not_fake() -> None:
         "blank image -> explanatory note, no invented data",
         any("no legible text" in n.lower() for n in result.notes),
     )
-    check("downstream fields stay pending", result.product == "Pending extraction")
-    check("downstream lists stay empty", result.declarations == [] and result.checks == [])
-    check("status is PENDING", result.status == "PENDING")
+    # Phase 14: downstream stages must degrade to REVIEW, never fabricate.
+    check("blank image -> declaration stage REVIEW",
+          result.declaration_stage.status == "REVIEW")
+    check("blank image -> no declarations invented",
+          result.declaration_stage.declarations == [])
+    check("blank image -> classification REVIEW",
+          result.classification.status == "REVIEW")
+    check("blank image -> no normalized product invented",
+          result.classification.normalized_product is None)
+    check("blank image -> standard match REVIEW",
+          result.standard_match.status == "REVIEW")
+    check("blank image -> no standard invented",
+          result.standard_match.standard is None)
+    check("blank image -> pipeline summary present, ocr COMPLETED",
+          result.pipeline.ocr == "COMPLETED"
+          and result.pipeline.legal_metrology == "NEXT")
 
 
 def test_rejects_non_image_bytes() -> None:

@@ -150,9 +150,45 @@ laboratories, hallmarking, consumer information, FAQs.
 | 10 | UI polish |
 | 11 | Testing |
 | 12 | Demo hardening |
-| 13 | Real IMAGE -> OCR (this phase) |
+| 13 | Real IMAGE -> OCR |
+| 14 | OCR -> declarations -> product -> Indian Standard (this phase) |
 
-*Phase 13 — real image -> OCR. `POST /inspection/analyze` (multipart, field
+*Phase 14 — OCR -> declaration extraction -> product classification -> verified
+Indian Standard lookup. `POST /inspection/analyze` now runs the downstream
+pipeline after OCR and returns `declaration_stage`, `classification`,
+`standard_match` and a `pipeline` stage summary (the old `product` /
+`declarations` / `checks` / `status` / `pipeline_stage` fields are gone). New
+backend modules, each a single surface: `app/declarations.py` (deterministic
+regex/keyword extraction of 14 declaration fields — every `Declaration` keeps its
+`source_region_id` + `bbox` + `ocr_confidence` + `method`; FSSAI licence is
+extracted but explicitly labelled food-safety, NOT a BIS standard),
+`app/classification.py` (deterministic product rules first, local Qwen3-4B strict
+-JSON fallback only when rules miss, `REVIEW` if the model is unavailable and no
+rule matched — the model classifies, it never emits a standard number: any
+standard-ish key or reason fragment is stripped), `app/standards_registry.py`
+(loads `data/standards_registry.json` — hand-verified BIS standards only; keyword
+-phrase overlap lookup returns the strongest verified match or `REVIEW`, never a
+generated IS number; a single generic word cannot match), `app/pipeline.py`
+(`run_downstream` — orchestrates the three stages, each isolated so one failure
+degrades that stage to `REVIEW` and the rest still run). `app/inspection.py`
+wires the pipeline in and converts the dataclasses to `*Out` models;
+`app/inspection_api.py` injects `LocalLLM(timeout=45)`. `app/llm.py` now also
+reads `LM_STUDIO_BASE_URL` / `LM_STUDIO_MODEL` (with `LLM_*` as fallback).
+Registry seed: **IS 18140:2023 — Roasted Bengal Gram — Specification** (verified,
+BIS committee FAD 16), IS 14543:2016 / IS 13428:2005 (packaged water). The
+`data/knowledge/` BIS Q&A set is untouched and unrelated (it has no food
+standards). Frontend: `InspectionView` keeps its exact design and adds a
+"Declared fields" panel (click a field -> its OCR box highlights on the image),
+an "Applicable Indian Standard" panel (number / title / source link / real
+confidence / why-this-match, or a `REVIEW` state), and swaps the `PENDING`
+literals in the downstream panel + the left summary for the real stage states.
+Legal-metrology PASS/FAIL is still `NEXT`. Tests: `test_declarations.py` (31),
+`test_standards_registry.py` (25), `test_classification.py` (21 — stubbed model),
+`test_pipeline.py` (30 — end-to-end + degradation + HTTP contract);
+`test_inspection_ocr.py` updated for the new response shape. Full suite 108
+passed.*
+
+*Phase 13 recap — real image -> OCR. `POST /inspection/analyze` (multipart, field
 `image`) decodes the uploaded package image, computes lightweight quality
 metrics (blur / brightness / contrast, numpy only), runs local OCR, and returns
 the raw OCR regions (`text`, `confidence`, axis-aligned `bbox` + `polygon` in
@@ -241,14 +277,17 @@ Phase 6 recap: certification guidance (`app/certification.py`,
 
 Frontend (MetrIQ): `frontend/` — React + TS + Vite + Tailwind v4. The product
 is presented as "MetrIQ — AI-Assisted Legal Metrology Inspection". Standards,
-Certification, Laboratories, Hallmarking and the header health dot call the real API; the
-Inspection / OCR / compliance / history / review surfaces run on clearly
-labelled placeholder data (`frontend/src/mocks.tsx`, `<MockDataBanner/>`)
-because the backend has no OCR/rules engine. Run: backend on :8000, then
+Certification, Laboratories, Hallmarking and the header health dot call the real
+API. The Inspection tab is real end to end through Phase 14: upload ->
+`/inspection/analyze` -> OCR + declarations + product classification + verified
+Indian Standard. History / Review / Dashboard still run on clearly labelled
+placeholder data (`frontend/src/mocks.tsx`) — the legal-metrology PASS/FAIL rule
+engine and the officer report are not built yet. Run: backend on :8000, then
 `cd frontend && npm install && npm run dev` (proxies `/api` -> :8000).
 
-All 12 development phases are complete. There is no next milestone; further work
-is maintenance only.
+Phases 1–14 are complete. The remaining work is the legal-metrology rule engine
+(deterministic PASS / FAIL / REVIEW over the extracted declarations + the matched
+standard) and the officer review / report surface.
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -267,6 +306,13 @@ sih26107/
       product.py       # Phase 5: Product -> Standard discovery + Phase 9 "Why this result?"
       certification.py # Phase 6: BIS certification guidance
       laboratory.py    # Phase 7: BIS-recognized laboratory search
+      ocr.py           # Phase 13: local OCR engine wrapper (rapidocr-onnxruntime)
+      inspection.py    # Phase 13/14: InspectionAnalyzer + response models
+      inspection_api.py# POST /inspection/analyze
+      declarations.py  # Phase 14: deterministic declaration extraction
+      classification.py# Phase 14: product classification (rules, else Qwen3-4B)
+      standards_registry.py # Phase 14: verified Indian Standard registry + lookup
+      pipeline.py      # Phase 14: OCR -> declarations -> product -> standard
       knowledge/       # knowledge-base schema + loader
         schema.py      # KnowledgeItem pydantic model + validation rules
         loader.py      # load + validate data/knowledge/, report every problem
@@ -286,13 +332,21 @@ sih26107/
       test_rag.py          # grounded RAG pipeline + /ask (fake LLM, 503 path)
       test_api_contract.py # real ASGI app via TestClient: shapes, 422, 404, 503
       test_llm_adapter.py  # app/llm.py: healthy parse + clean LLMError on every failure
+      test_inspection_ocr.py # Phase 13: real OCR engine on synthesised labels + HTTP contract
+      test_declarations.py # Phase 14: deterministic declaration extraction
+      test_standards_registry.py # Phase 14: verified-only registry + lookup, never guesses
+      test_classification.py # Phase 14: product classification (model stubbed)
+      test_pipeline.py     # Phase 14: OCR -> standard end-to-end + stage degradation
       test_plain_runners.py # pytest bridge — runs every runner, makes pytest authoritative
       fixtures/broken_kb/  # deliberately invalid KB for the loader tests
     requirements.txt
     .env.example
   data/
-    knowledge/         # the BIS knowledge base: one JSON file per category
-  frontend/            # React + Vite app — added when the UI phase begins
+    knowledge/         # the BIS knowledge base: one JSON file per category (Q&A / retrieval)
+    standards_registry.json # Phase 14: hand-verified Indian Standards for Product -> Standard
+  samples/
+    ocr-labels/        # sample package images for testing /inspection/analyze
+  frontend/            # React + Vite app
 ```
 
 ### Knowledge base

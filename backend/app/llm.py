@@ -26,11 +26,20 @@ class LocalLLM:
         model: str | None = None,
         timeout: float = 150.0,
     ) -> None:
+        # LM_STUDIO_* are the documented names; LLM_* kept as a fallback so
+        # existing setups keep working.
         self.base_url = (
             base_url
-            or os.getenv("LLM_BASE_URL", "http://127.0.0.1:1234/v1")
+            or os.getenv("LM_STUDIO_BASE_URL")
+            or os.getenv("LLM_BASE_URL")
+            or "http://127.0.0.1:1234/v1"
         ).rstrip("/")
-        self.model = model or os.getenv("LLM_MODEL", "qwen/qwen3-4b")
+        self.model = (
+            model
+            or os.getenv("LM_STUDIO_MODEL")
+            or os.getenv("LLM_MODEL")
+            or "qwen/qwen3-4b"
+        )
         self.timeout = timeout
 
     def generate(
