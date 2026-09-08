@@ -11,7 +11,7 @@ See [`CLAUDE.md`](./CLAUDE.md) for the full project rules and roadmap.
 
 ## Status
 
-Phases 1–10 complete. The backend exposes deterministic retrieval plus grounded
+Phases 1–12 complete. The backend exposes deterministic retrieval plus grounded
 explanation; the frontend (MetrIQ) is a complete inspection-oriented UI.
 
 | Endpoint | What it does | LLM? |
@@ -92,6 +92,15 @@ If LM Studio is not running, the deterministic endpoints (`/search`,
 `/product-standard`) still work fully, and the grounded endpoints return a clear
 `503` instead of a fabricated answer.
 
+### Demoing
+
+The reliable, LLM-free path is **Product → Standard** (the "Standards" screen):
+type a product, get candidate Indian Standards with a deterministic "Why this
+result?" and the official BIS source — no local model involved. The header
+health dot and the Laboratories screen (default, `explain` off) are also
+LLM-free. The grounded Q&A screens (Certification, Hallmarking) need LM Studio;
+on this machine local inference can be slow, so lead with Product → Standard.
+
 ## Running the frontend
 
 ```bash
@@ -107,13 +116,20 @@ map of which screens call which endpoint.
 
 ```bash
 cd backend
-./.venv/bin/python -m pytest -q                 # all suites
+./.venv/bin/python -m pytest -q                 # all suites (bridged to the runners below)
 ./.venv/bin/python scripts/check_knowledge.py   # knowledge-base validation
+
+# the authoritative runners can also be run one by one:
+for t in tests/test_*.py; do ./.venv/bin/python "$t"; done
 
 cd ../frontend
 npx tsc --noEmit                                # type check
 npm run build                                   # production build
 ```
+
+The backend suites are plain-Python runners (each exits non-zero on failure);
+`tests/test_plain_runners.py` runs them all under pytest, so `pytest -q` is an
+authoritative gate. LLM tests use a fake local model — no LM Studio needed.
 
 ## Retrieval scoring (reference)
 

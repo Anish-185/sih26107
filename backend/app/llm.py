@@ -56,8 +56,18 @@ class LocalLLM:
                 timeout=self.timeout,
             )
             response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            # LM Studio answered, but with an error status. Keep the message
+            # short and user-facing — no internal URL or library hint text.
+            raise LLMError(
+                f"LM Studio returned HTTP {exc.response.status_code}"
+            ) from exc
         except httpx.HTTPError as exc:
-            raise LLMError(f"LM Studio request failed: {exc}") from exc
+            # Timeout, connection refused, DNS, etc. Name the failure kind
+            # without dumping the full transport exception.
+            raise LLMError(
+                f"could not reach LM Studio ({exc.__class__.__name__})"
+            ) from exc
 
         try:
             data = response.json()

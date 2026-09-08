@@ -151,7 +151,19 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-*Current status: Phase 11 complete — testing. No application code changed.
+*Current status: Phase 12 complete — demo hardening. Full clean-shell startup,
+frontend<->backend integration and the deterministic demo path
+(Product -> Standard -> Why this result -> evidence, LLM-free) were verified
+end to end; no white screens, console errors or contract mismatches. One small
+fix: `app/llm.py` now raises a short user-facing `LLMError` on an LM Studio HTTP
+error / timeout ("LM Studio returned HTTP 400", "could not reach LM Studio
+(ReadTimeout)") instead of stringifying the raw httpx exception, which had been
+leaking an internal URL and an MDN link into the error callout. Behaviour is
+unchanged — still a 503, still no fabricated answer. Regression test:
+`backend/tests/test_llm_adapter.py` (15 checks, stubbed `httpx.post`). README
+gained a "Demoing" note (lead with the LLM-free Product -> Standard path) and
+the authoritative-test command.
+Phase 11 recap: testing. No application code changed.
 Added `backend/tests/test_rag.py` (dedicated grounded-RAG / `/ask` coverage:
 evidence reaches the LLM, abstention makes no LLM call, sources preserved,
 `/ask` returns 503 on an LLM outage, no invented standard numbers, system-prompt
@@ -210,7 +222,8 @@ labelled placeholder data (`frontend/src/mocks.tsx`, `<MockDataBanner/>`)
 because the backend has no OCR/rules engine. Run: backend on :8000, then
 `cd frontend && npm install && npm run dev` (proxies `/api` -> :8000).
 
-Next backend milestone: Phase 12 (demo hardening).
+All 12 development phases are complete. There is no next milestone; further work
+is maintenance only.
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -247,6 +260,7 @@ sih26107/
       test_hallmarking.py  # hallmarking / HUID (via /ask)
       test_rag.py          # grounded RAG pipeline + /ask (fake LLM, 503 path)
       test_api_contract.py # real ASGI app via TestClient: shapes, 422, 404, 503
+      test_llm_adapter.py  # app/llm.py: healthy parse + clean LLMError on every failure
       test_plain_runners.py # pytest bridge — runs every runner, makes pytest authoritative
       fixtures/broken_kb/  # deliberately invalid KB for the loader tests
     requirements.txt
