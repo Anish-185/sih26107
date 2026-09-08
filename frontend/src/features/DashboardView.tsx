@@ -19,6 +19,7 @@ const QUICK_ACTIONS = [
   { to: "/standards", label: "Product → Standard", hint: "Find the applicable IS" },
   { to: "/certification", label: "Certification guidance", hint: "Grounded BIS answers" },
   { to: "/laboratories", label: "Laboratory search", hint: "BIS recognised labs" },
+  { to: "/hallmarking", label: "Hallmarking / HUID", hint: "Grounded BIS answers" },
 ];
 
 export function DashboardView() {

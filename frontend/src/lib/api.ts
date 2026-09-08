@@ -158,6 +158,14 @@ export interface LaboratorySearchResponse {
   note: string;
 }
 
+export interface AskResponse {
+  question: string;
+  answer: string;
+  grounded: boolean;
+  source_count: number;
+  sources: EvidenceSource[];
+}
+
 /* --------------------------------------------------------------- endpoints --- */
 
 export const api = {
@@ -181,5 +189,13 @@ export const api = {
       "/laboratory-search",
       { method: "POST", body: JSON.stringify({ query, standard, explain }) },
       explain ? 90_000 : 20_000,
+    ),
+
+  // Grounded BIS Q&A (Phase 4). Used for the Hallmarking / HUID information view.
+  ask: (question: string) =>
+    request<AskResponse>(
+      "/ask",
+      { method: "POST", body: JSON.stringify({ question }) },
+      90_000,
     ),
 };

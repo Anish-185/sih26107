@@ -151,29 +151,37 @@ laboratories, hallmarking, consumer information, FAQs.
 | 11 | Testing |
 | 12 | Demo hardening |
 
-*Current status: Phase 7 complete — BIS-recognized laboratory search
-(`app/laboratory.py`) exposed as `POST /laboratory-search`. It runs the Phase 3
-`SearchEngine` over the `laboratories` / `testing` categories, identifies an
-Indian Standard the query names, checks evidence sufficiency, and optionally
-(`explain`, default true) asks the local LLM to explain that evidence. The
-curated KB holds NO individual laboratory records (no names, addresses,
-recognition status, NABL numbers, or IS-wise scope), so the service never names
-a laboratory: it points to BIS's official recognised/empanelled-lab lists and
-the LIMS portal (lims.bis.gov.in), and abstains with a fixed message (no LLM
-call) when no lab/testing evidence is retrieved.
+*Current status: Phase 8 complete — Hallmarking / HUID information. Phase 8 adds
+NO new retrieval engine and NO new endpoint: hallmarking / HUID questions go
+through the existing deterministic `SearchEngine` + grounded `/ask` pipeline
+(`app/rag.py`). The curated KB's `hallmarking` category (plus hallmarking FAQs
+and consumer pages) supplies the evidence; it contains no concrete HUID value to
+leak. `rag.py`'s shared `SYSTEM_PROMPT` gained rule 6: never claim to verify /
+authenticate a specific physical item's HUID, hallmark, licence or registration,
+and never output a HUID not present in the supplied context. Frontend:
+`frontend/src/features/HallmarkingView.tsx` (route `/hallmarking`, nav
+"Hallmarking") calls `api.ask` and renders via the shared `<GroundedAnswer/>`;
+it states plainly it does not run live HUID verification. Tests:
+`backend/tests/test_hallmarking.py` (37 checks). No individual-lab / no
+fabrication rules carry over from Phase 7.
+Phase 7 recap: BIS-recognized laboratory search (`app/laboratory.py`,
+`POST /laboratory-search`) — runs the Phase 3 `SearchEngine` over
+`laboratories` / `testing`, never names a laboratory (KB has no lab records),
+points to BIS's official lists + the LIMS portal, abstains with a fixed message
+when no evidence is retrieved.
 Phase 6 recap: certification guidance (`app/certification.py`,
 `POST /certification-guidance`). Phase 5 recap: Product -> Standard discovery
 (`app/product.py`, `POST /product-standard`).
 
 Frontend (MetrIQ): `frontend/` — React + TS + Vite + Tailwind v4. The product
 is presented as "MetrIQ — AI-Assisted Legal Metrology Inspection". Standards,
-Certification, Laboratories and the header health dot call the real API; the
+Certification, Laboratories, Hallmarking and the header health dot call the real API; the
 Inspection / OCR / compliance / history / review surfaces run on clearly
 labelled placeholder data (`frontend/src/mocks.tsx`, `<MockDataBanner/>`)
 because the backend has no OCR/rules engine. Run: backend on :8000, then
 `cd frontend && npm install && npm run dev` (proxies `/api` -> :8000).
 
-Next backend milestone: Phase 8 (Hallmarking / HUID information).
+Next backend milestone: Phase 9 (Why this result).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 
@@ -206,6 +214,7 @@ sih26107/
       test_product.py      # plain-Python checks for Product -> Standard
       test_certification.py # plain-Python checks for certification guidance
       test_laboratory.py   # plain-Python checks for laboratory search
+      test_hallmarking.py  # plain-Python checks for hallmarking / HUID (via /ask)
     requirements.txt
     .env.example
   data/

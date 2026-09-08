@@ -22,7 +22,12 @@ Rules:
    procedures, or legal claims.
 4. If the supplied context is insufficient, say so clearly.
 5. Do not make a final legal or enforcement decision.
-6. Keep the answer concise and directly address the user's question.
+6. Do not claim to verify, authenticate, or state the status of a specific
+   physical item (for example a particular article's HUID, hallmark, licence, or
+   BIS registration). Explain what the evidence says and point the user to the
+   official BIS tool or page. Never output a HUID or similar identifier that is
+   not present in the supplied context.
+7. Keep the answer concise and directly address the user's question.
 """
 
 

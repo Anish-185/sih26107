@@ -8,6 +8,7 @@ import { InspectionView } from "@/features/inspection/InspectionView";
 import { StandardsView } from "@/features/StandardsView";
 import { CertificationView } from "@/features/CertificationView";
 import { LaboratoriesView } from "@/features/LaboratoriesView";
+import { HallmarkingView } from "@/features/HallmarkingView";
 import { HistoryView } from "@/features/HistoryView";
 import { ReviewView } from "@/features/ReviewView";
 import { NotFoundView } from "@/features/NotFoundView";
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "standards", element: <StandardsView /> },
       { path: "certification", element: <CertificationView /> },
       { path: "laboratories", element: <LaboratoriesView /> },
+      { path: "hallmarking", element: <HallmarkingView /> },
       { path: "history", element: <HistoryView /> },
       { path: "history/:inspectionId", element: <ReviewView /> },
       { path: "*", element: <NotFoundView /> },
