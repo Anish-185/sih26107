@@ -1,0 +1,113 @@
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+@import "tailwindcss";
+
+/*
+  MetrIQ design system.
+  Single committed light theme — soft warm paper, charcoal structure, one
+  confident blue accent, muted compliance states. Structure comes from
+  spacing / type / 1px borders, not shadows.
+*/
+@theme {
+  --color-paper: #f4f3f0;
+  --color-surface: #faf9f7;
+  --color-raised: #ffffff;
+
+  --color-ink: #17181b;
+  --color-ink-soft: #585c63;
+  --color-ink-faint: #8b8e94;
+
+  --color-line: #e4e2db;
+  --color-line-strong: #ccc9bf;
+
+  --color-accent: #2246ef;
+  --color-accent-hover: #1a37c9;
+  --color-accent-soft: #eceffe;
+  --color-accent-line: #c3ccfb;
+
+  --color-pass: #1c7a4b;
+  --color-pass-soft: #e8f1ec;
+  --color-pass-line: #b3d1c1;
+  --color-fail: #b0271d;
+  --color-fail-soft: #f6e8e6;
+  --color-fail-line: #e2beb9;
+  --color-review: #8a6200;
+  --color-review-soft: #f3ecd9;
+  --color-review-line: #ddcfa2;
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", "Menlo",
+    "Consolas", monospace;
+
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+
+  --tracking-tightest: -0.04em;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+}
+
+@layer components {
+  /* Editorial kicker used above section headings. */
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+
+  /* Fine engineered grid used behind the system-layer footer. */
+  .metriq-grid {
+    background-image: linear-gradient(
+        rgba(255, 255, 255, 0.09) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1120" viewBox="0 0 900 1120" font-family="Inter, Arial, sans-serif">
+  <rect width="900" height="1120" fill="#efeee9"/>
+  <rect x="40" y="40" width="820" height="1040" fill="#ffffff" stroke="#d9d7cf" stroke-width="2"/>
+  <rect x="40" y="40" width="820" height="120" fill="#17181b"/>
+  <text x="72" y="118" fill="#ffffff" font-size="52" font-weight="700" letter-spacing="-1">AQUALINE</text>
+  <text x="72" y="150" fill="#9fa1a6" font-size="20" letter-spacing="3">STAINLESS STEEL VACUUM BOTTLE</text>
+
+  <text x="72" y="250" fill="#585c63" font-size="22" letter-spacing="2">PRODUCT</text>
+  <text x="72" y="292" fill="#17181b" font-size="34" font-weight="600">Stainless Steel Water Bottle</text>
+
+  <line x1="72" y1="340" x2="828" y2="340" stroke="#e4e2db" stroke-width="2"/>
+
+  <text x="72" y="410" fill="#585c63" font-size="22" letter-spacing="2">NET QUANTITY</text>
+  <text x="72" y="456" fill="#17181b" font-size="40" font-weight="700">1000 ml</text>
+
+  <text x="470" y="410" fill="#585c63" font-size="22" letter-spacing="2">MRP (INCL. OF ALL TAXES)</text>
+  <text x="470" y="456" fill="#17181b" font-size="40" font-weight="700">&#8377; 999</text>
+
+  <line x1="72" y1="510" x2="828" y2="510" stroke="#e4e2db" stroke-width="2"/>
+
+  <text x="72" y="576" fill="#585c63" font-size="22" letter-spacing="2">MANUFACTURED &amp; MARKETED BY</text>
+  <text x="72" y="618" fill="#17181b" font-size="30" font-weight="600">ABC Industries Pvt Ltd</text>
+  <text x="72" y="654" fill="#585c63" font-size="22">Plot 14, MIDC Industrial Area, Pune 411019</text>
+
+  <text x="72" y="740" fill="#585c63" font-size="22" letter-spacing="2">MONTH &amp; YEAR OF MANUFACTURE</text>
+  <text x="72" y="782" fill="#17181b" font-size="30" font-weight="600">03 / 2026</text>
+
+  <text x="470" y="740" fill="#585c63" font-size="22" letter-spacing="2">CONSUMER CARE</text>
+  <text x="470" y="782" fill="#17181b" font-size="30" font-weight="600">care@abcind.example</text>
+
+  <line x1="72" y1="838" x2="828" y2="838" stroke="#e4e2db" stroke-width="2"/>
+
+  <text x="72" y="900" fill="#585c63" font-size="22" letter-spacing="2">STANDARD MARK</text>
+  <text x="72" y="944" fill="#17181b" font-size="30" font-weight="600">IS 17526 · CM/L-1234567</text>
+
+  <rect x="640" y="864" width="188" height="120" fill="#f4f3f0" stroke="#17181b" stroke-width="2"/>
+  <text x="734" y="915" fill="#17181b" font-size="26" font-weight="700" text-anchor="middle">ISI</text>
+  <text x="734" y="950" fill="#585c63" font-size="16" text-anchor="middle">IS 17526:2021</text>
+</svg>

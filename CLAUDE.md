@@ -164,7 +164,16 @@ call) when no lab/testing evidence is retrieved.
 Phase 6 recap: certification guidance (`app/certification.py`,
 `POST /certification-guidance`). Phase 5 recap: Product -> Standard discovery
 (`app/product.py`, `POST /product-standard`).
-Next: Phase 8 (Hallmarking / HUID information).
+
+Frontend (MetrIQ): `frontend/` — React + TS + Vite + Tailwind v4. The product
+is presented as "MetrIQ — AI-Assisted Legal Metrology Inspection". Standards,
+Certification, Laboratories and the header health dot call the real API; the
+Inspection / OCR / compliance / history / review surfaces run on clearly
+labelled placeholder data (`frontend/src/mocks.tsx`, `<MockDataBanner/>`)
+because the backend has no OCR/rules engine. Run: backend on :8000, then
+`cd frontend && npm install && npm run dev` (proxies `/api` -> :8000).
+
+Next backend milestone: Phase 8 (Hallmarking / HUID information).
 
 Only implement the current milestone. Do not start a new phase without being asked.
 

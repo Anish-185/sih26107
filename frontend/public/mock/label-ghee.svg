@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1120" viewBox="0 0 900 1120" font-family="Inter, Arial, sans-serif">
+  <rect width="900" height="1120" fill="#efeee9"/>
+  <rect x="40" y="40" width="820" height="1040" fill="#ffffff" stroke="#d9d7cf" stroke-width="2"/>
+  <rect x="40" y="40" width="820" height="120" fill="#8a6200"/>
+  <text x="72" y="118" fill="#ffffff" font-size="52" font-weight="700" letter-spacing="-1">SURYA PURE GHEE</text>
+  <text x="72" y="150" fill="#f3ecd9" font-size="20" letter-spacing="3">PACKAGED EDIBLE OIL / FAT</text>
+
+  <text x="72" y="250" fill="#585c63" font-size="22" letter-spacing="2">PRODUCT</text>
+  <text x="72" y="292" fill="#17181b" font-size="34" font-weight="600">Cow Ghee (Clarified Butter)</text>
+
+  <line x1="72" y1="340" x2="828" y2="340" stroke="#e4e2db" stroke-width="2"/>
+
+  <text x="72" y="410" fill="#585c63" font-size="22" letter-spacing="2">NET QUANTITY</text>
+  <text x="72" y="456" fill="#17181b" font-size="40" font-weight="700">450 g</text>
+
+  <text x="470" y="410" fill="#585c63" font-size="22" letter-spacing="2">MRP</text>
+  <text x="470" y="456" fill="#17181b" font-size="40" font-weight="700">Rs 449/-</text>
+
+  <line x1="72" y1="510" x2="828" y2="510" stroke="#e4e2db" stroke-width="2"/>
+
+  <text x="72" y="576" fill="#585c63" font-size="22" letter-spacing="2">MARKETED BY</text>
+  <text x="72" y="618" fill="#17181b" font-size="30" font-weight="600">Surya Foods LLP</text>
+  <text x="72" y="654" fill="#585c63" font-size="22">Survey 9, Anand, Gujarat</text>
+
+  <text x="72" y="740" fill="#585c63" font-size="22" letter-spacing="2">DATE OF PACKING</text>
+  <text x="72" y="782" fill="#17181b" font-size="30" font-weight="600">15/02/2026</text>
+
+  <text x="470" y="740" fill="#585c63" font-size="22" letter-spacing="2">BEST BEFORE</text>
+  <text x="470" y="782" fill="#17181b" font-size="30" font-weight="600">9 MONTHS FROM PACKING</text>
+
+  <line x1="72" y1="838" x2="828" y2="838" stroke="#e4e2db" stroke-width="2"/>
+
+  <text x="72" y="900" fill="#585c63" font-size="22" letter-spacing="2">FSSAI LIC. NO.</text>
+  <text x="72" y="944" fill="#17181b" font-size="30" font-weight="600">100260000xxxxx</text>
+</svg>

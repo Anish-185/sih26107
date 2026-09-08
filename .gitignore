@@ -10,10 +10,11 @@ venv/
 .env
 .env.local
 
-# Node / frontend (added in a later phase)
+# Node / frontend
 node_modules/
 dist/
 frontend/.vite/
+*.tsbuildinfo
 
 # Editors / OS
 .vscode/
