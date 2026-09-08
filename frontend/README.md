@@ -31,6 +31,7 @@ npm run preview        # serve dist/ on :4173
 | Standards | `POST /product-standard` | ✅ real |
 | Certification | `POST /certification-guidance` | ✅ real (local LLM) |
 | Laboratories | `POST /laboratory-search` | ✅ real (`explain=false` by default) |
+| Hallmarking / HUID | `POST /ask` | ✅ real (local LLM) |
 | Header status dot | `GET /health` | ✅ real |
 | Inspection · applicable standard | `POST /product-standard` | ✅ real |
 | Inspection · OCR / declarations / checks / result | — | ⚠️ mock (`src/mocks.tsx`) |
@@ -57,7 +58,7 @@ src/
     GroundedAnswer.tsx  shared answer/evidence/sources renderer
   features/
     DashboardView, StandardsView, CertificationView, LaboratoriesView,
-    HistoryView, ReviewView, NotFoundView
+    HallmarkingView, HistoryView, ReviewView, NotFoundView
     inspection/InspectionView, inspection/ImageInspector
   mocks.tsx             isolated placeholder data + MockDataBanner
 ```
