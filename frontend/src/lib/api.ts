@@ -205,6 +205,6 @@ export const api = {
     request<AskResponse>(
       "/ask",
       { method: "POST", body: JSON.stringify({ question }) },
-      90_000,
+      120_000,
     ),
 };

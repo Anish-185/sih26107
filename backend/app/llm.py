@@ -3,8 +3,14 @@
 from __future__ import annotations
 
 import os
+import re
 
 import httpx
+
+# Reasoning models (Qwen3) emit a <think>...</think> block before the answer.
+# We ask the server to skip it, but strip any that slips through so the grounded
+# text stays clean and short.
+_THINK_BLOCK = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
 class LLMError(RuntimeError):
@@ -18,7 +24,7 @@ class LocalLLM:
         self,
         base_url: str | None = None,
         model: str | None = None,
-        timeout: float = 120.0,
+        timeout: float = 150.0,
     ) -> None:
         self.base_url = (
             base_url
@@ -33,13 +39,14 @@ class LocalLLM:
         system_prompt: str,
         user_prompt: str,
         temperature: float = 0.1,
+        max_tokens: int = 400,
     ) -> str:
         payload = {
             "model": self.model,
             "messages": [
                 {
                     "role": "system",
-                    "content": system_prompt,
+                    "content": f"{system_prompt}\n\n/no_think",
                 },
                 {
                     "role": "user",
@@ -47,6 +54,9 @@ class LocalLLM:
                 },
             ],
             "temperature": temperature,
+            "max_tokens": max_tokens,
+            # Qwen3 / LM Studio: disable the reasoning pass entirely.
+            "chat_template_kwargs": {"enable_thinking": False},
         }
 
         try:
@@ -80,4 +90,8 @@ class LocalLLM:
         if not isinstance(content, str) or not content.strip():
             raise LLMError("LM Studio returned an empty response")
 
-        return content.strip()
+        content = _THINK_BLOCK.sub("", content).strip()
+        if not content:
+            raise LLMError("LM Studio returned an empty response")
+
+        return content
