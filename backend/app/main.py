@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import router as search_router
+from app.inspection_api import router as inspection_router
 
 app = FastAPI(
     title="BIS Assistant API",
@@ -38,3 +39,4 @@ def health() -> dict:
 
 
 app.include_router(search_router)
+app.include_router(inspection_router)

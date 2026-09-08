@@ -150,8 +150,33 @@ laboratories, hallmarking, consumer information, FAQs.
 | 10 | UI polish |
 | 11 | Testing |
 | 12 | Demo hardening |
+| 13 | Real IMAGE -> OCR (this phase) |
 
-*Current status: Phase 12 complete — demo hardening. Full clean-shell startup,
+*Phase 13 — real image -> OCR. `POST /inspection/analyze` (multipart, field
+`image`) decodes the uploaded package image, computes lightweight quality
+metrics (blur / brightness / contrast, numpy only), runs local OCR, and returns
+the raw OCR regions (`text`, `confidence`, axis-aligned `bbox` + `polygon` in
+source pixels, `OCR-NNN` id) plus the joined text. New backend modules:
+`app/ocr.py` (engine wrapper — one surface, `run_ocr`), `app/inspection.py`
+(models + `InspectionAnalyzer`), `app/inspection_api.py` (router, wired in
+`app/main.py`). OCR engine: `rapidocr-onnxruntime` — the PaddleOCR PP-OCRv3
+detection/cls/recognition weights run through ONNX Runtime, because PaddlePaddle
+publishes no wheels for this Python; models ship in the wheel so OCR is fully
+local with no network at inference. NOTHING downstream is done here — the
+response's `product` / `declarations` / `checks` / `status` are explicitly
+`"Pending extraction"` / `[]` / `"PENDING"`, never invented. The LLM (Qwen3-4B)
+is untouched and is not involved in OCR. Frontend: `InspectionView` now runs the
+real flow (upload -> `/inspection/analyze` -> OCR workspace with the image, the
+overlaid boxes, per-region text/confidence, raw text, quality metrics); an empty
+or failed OCR shows an honest empty / error state and never substitutes the old
+demo inspection. `mocks.tsx` is unchanged and still backs History / Review /
+Dashboard. Tests: `backend/tests/test_inspection_ocr.py` (41 checks — real
+engine on synthesised labels, blank image -> zero regions, non-image -> error,
+HTTP contract). `backend/tests/test_llm_adapter.py` regression test unchanged.
+The deterministic rule engine, declaration extraction and PASS/FAIL remain
+future phases.*
+
+*Phase 12 recap: demo hardening. Full clean-shell startup,
 frontend<->backend integration and the deterministic demo path
 (Product -> Standard -> Why this result -> evidence, LLM-free) were verified
 end to end; no white screens, console errors or contract mismatches. One small

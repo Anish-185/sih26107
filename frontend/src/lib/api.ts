@@ -40,18 +40,17 @@ async function request<T>(
   let response: Response;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  // JSON by default; for FormData let the browser set the multipart boundary.
+  const isForm = init?.body instanceof FormData;
   try {
     response = await fetch(`${API_BASE}${path}`, {
-      headers: { "content-type": "application/json" },
+      headers: isForm ? undefined : { "content-type": "application/json" },
       signal: controller.signal,
       ...init,
     });
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") {
-      throw new ApiError(
-        408,
-        "The request timed out — the local language model is taking too long to respond. Please try again in a moment.",
-      );
+      throw new ApiError(408, "The request timed out. Please try again.");
     }
     throw new ApiError(0, "Cannot reach the MetrIQ backend. Is the API running?");
   } finally {
@@ -175,6 +174,50 @@ export interface AskResponse {
   sources: EvidenceSource[];
 }
 
+/* ---- inspection: real IMAGE -> OCR pipeline (POST /inspection/analyze) --- */
+
+export interface OcrRegion {
+  id: string;
+  text: string;
+  confidence: number; // 0–1
+  bbox: [number, number, number, number]; // [x1,y1,x2,y2] in source pixels
+  polygon: number[][]; // [[x,y] x4]
+}
+
+export interface InspectionAnalysis {
+  inspection_id: string;
+  created_at: string;
+  image: {
+    filename: string;
+    format: string;
+    width: number;
+    height: number;
+    bytes: number;
+  };
+  quality: {
+    blur_score: number;
+    brightness: number;
+    contrast: number;
+    is_low_quality: boolean;
+    notes: string[];
+  };
+  ocr: {
+    engine: string;
+    text: string;
+    region_count: number;
+    mean_confidence: number;
+    duration_ms: number;
+    regions: OcrRegion[];
+  };
+  // Downstream phases — not implemented yet, returned explicitly empty/pending.
+  product: string;
+  declarations: unknown[];
+  checks: unknown[];
+  status: string;
+  pipeline_stage: string;
+  notes: string[];
+}
+
 /* --------------------------------------------------------------- endpoints --- */
 
 export const api = {
@@ -207,4 +250,15 @@ export const api = {
       { method: "POST", body: JSON.stringify({ question }) },
       120_000,
     ),
+
+  // Inspection: send the package image, get real OCR back.
+  analyzeInspection: (file: File) => {
+    const form = new FormData();
+    form.append("image", file);
+    return request<InspectionAnalysis>(
+      "/inspection/analyze",
+      { method: "POST", body: form },
+      120_000,
+    );
+  },
 };

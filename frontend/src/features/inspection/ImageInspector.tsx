@@ -1,44 +1,52 @@
 import { useState } from "react";
-import { cn } from "@/lib/cn";
 import { Mono } from "@/components/ui";
-import type { MockDeclaration } from "@/mocks";
+import type { OcrRegion } from "@/lib/api";
 
 /**
- * Package image with OCR bounding regions overlaid. Selecting a declaration
- * elsewhere highlights its region here (and vice-versa). Coordinates are
- * percentages of the image so the overlay tracks any rendered size.
+ * The uploaded package image with the real OCR regions overlaid. Selecting a
+ * region here highlights it in the detected-text panel and vice-versa.
+ *
+ * OCR bounding boxes come back in source-image pixels; we convert them to
+ * percentages of the natural image size so the overlay tracks any rendered
+ * width.
  */
 export function ImageInspector({
-  images,
-  declarations,
+  src,
+  label = "Package image 01",
+  width,
+  height,
+  regions,
   selectedId,
   onSelect,
 }: {
-  images: { index: number; src: string; label: string }[];
-  declarations: MockDeclaration[];
+  src: string;
+  label?: string;
+  width: number;
+  height: number;
+  regions: OcrRegion[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }) {
-  const [activeImage, setActiveImage] = useState(0);
   const [hoverId, setHoverId] = useState<string | null>(null);
-  const regions = declarations.filter((d) => d.imageIndex === activeImage);
-  const image = images[activeImage];
+  const activeId = hoverId ?? selectedId;
+  const safeW = width || 1;
+  const safeH = height || 1;
 
   return (
     <div className="border border-line bg-raised">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
         <Mono muted className="text-[11px] uppercase tracking-[0.12em]">
-          {image.label}
+          {label}
         </Mono>
         <Mono muted className="text-[11px]">
-          {regions.length} regions
+          {regions.length} {regions.length === 1 ? "region" : "regions"}
         </Mono>
       </div>
 
       <div className="relative overflow-hidden bg-[#efeee9]">
         <img
-          src={image.src}
-          alt={`${image.label} — inspected package`}
+          src={src}
+          alt="Inspected package"
           className="block w-full select-none"
           draggable={false}
         />
@@ -48,66 +56,54 @@ export function ImageInspector({
           preserveAspectRatio="none"
           aria-hidden
         >
-          {regions.map((d) => {
-            const active = d.id === selectedId || d.id === hoverId;
+          {regions.map((r) => {
+            const [x1, y1, x2, y2] = r.bbox;
+            const x = (x1 / safeW) * 100;
+            const y = (y1 / safeH) * 100;
+            const w = ((x2 - x1) / safeW) * 100;
+            const h = ((y2 - y1) / safeH) * 100;
+            const active = r.id === activeId;
             return (
               <rect
-                key={d.id}
-                x={d.bbox.x}
-                y={d.bbox.y}
-                width={d.bbox.w}
-                height={d.bbox.h}
+                key={r.id}
+                x={x}
+                y={y}
+                width={w}
+                height={h}
                 vectorEffect="non-scaling-stroke"
                 className="cursor-pointer transition-[fill-opacity,stroke] duration-150"
                 fill="var(--color-accent)"
                 fillOpacity={active ? 0.12 : 0}
                 stroke={active ? "var(--color-accent)" : "rgba(23,24,27,0.4)"}
                 strokeWidth={active ? 2 : 1}
-                onMouseEnter={() => setHoverId(d.id)}
+                onMouseEnter={() => setHoverId(r.id)}
                 onMouseLeave={() => setHoverId(null)}
-                onClick={() => onSelect(d.id === selectedId ? null : d.id)}
+                onClick={() => onSelect(r.id === selectedId ? null : r.id)}
               />
             );
           })}
         </svg>
 
-        {/* label tag for the hovered/selected region */}
+        {/* text tag for the hovered / selected region */}
         {regions
-          .filter((d) => d.id === (hoverId ?? selectedId))
-          .map((d) => (
+          .filter((r) => r.id === activeId)
+          .map((r) => (
             <div
-              key={d.id}
-              className="pointer-events-none absolute -translate-y-full border border-accent bg-accent px-1.5 py-0.5 font-mono text-[10px] text-white"
-              style={{ left: `${d.bbox.x}%`, top: `${d.bbox.y}%` }}
+              key={r.id}
+              className="pointer-events-none absolute max-w-[70%] -translate-y-full truncate border border-accent bg-accent px-1.5 py-0.5 font-mono text-[10px] text-white"
+              style={{
+                left: `${(r.bbox[0] / safeW) * 100}%`,
+                top: `${(r.bbox[1] / safeH) * 100}%`,
+              }}
             >
-              {d.label}
+              {r.text}
             </div>
           ))}
       </div>
 
-      {images.length > 1 && (
-        <div className="flex gap-2 border-t border-line p-2">
-          {images.map((img) => (
-            <button
-              key={img.index}
-              type="button"
-              onClick={() => setActiveImage(img.index)}
-              className={cn(
-                "h-14 w-11 overflow-hidden border",
-                img.index === activeImage
-                  ? "border-accent"
-                  : "border-line hover:border-ink",
-              )}
-            >
-              <img src={img.src} alt={img.label} className="h-full w-full object-cover" />
-            </button>
-          ))}
-        </div>
-      )}
-
       <div className="border-t border-line px-4 py-2.5">
         <Mono muted className="text-[10px] uppercase tracking-[0.12em]">
-          Bounding coordinates are OCR estimates · demo data
+          Bounding boxes are the OCR engine's estimates
         </Mono>
       </div>
     </div>
